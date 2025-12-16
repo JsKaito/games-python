@@ -11,9 +11,9 @@ def crearTablero(tamaño, numMinas):
         size = numMinas,
         replace = False
     )
-    
+
     filas, columnas = np.unravel_index(posicionesBombas, (tamaño, tamaño))
-    tablero[filas, columnas] = 1
+    tablero[filas, columnas] = -1
     
     print(tablero)
     
