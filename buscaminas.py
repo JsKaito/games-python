@@ -1,10 +1,9 @@
 import numpy as np
 
-tamaño = 9
-casillas = tamaño**2
-
 # Función de creación del tablero
 def crearTablero(tamaño, numMinas):
+    
+    casillas = tamaño ** 2
     tablero = np.full((tamaño, tamaño), 0)
     
     posicionesBombas = np.random.choice(
@@ -18,6 +17,6 @@ def crearTablero(tamaño, numMinas):
     
     print(tablero)
     
-crearTablero(9, 10) 
+crearTablero(9, 10)
 
-# TODO Investigar por qué a mayor tamaño peor distribución de bombas
+# ARREGLADA DEPENDENCIA DE VARIABLES, ELIMINACIÓN DE VARIABLES COMO TAMAÑO, SE INTRODUCEN VÍA FUNCIÓN AHORA.
