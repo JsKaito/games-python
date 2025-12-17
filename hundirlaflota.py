@@ -29,4 +29,10 @@ for barco, tamano in barcos:
             print()
 
         print(f"\nColoca tu {barco} (tamaño {tamano})")
+        # Pedir datos
+        fila_letra = input("Fila (A-J): ")
+        columna = int(input("Columna (1-10): ")) - 1
+        orientacion = input("Orientación (H/V): ").upper()
+
+        fila = ord(fila_letra.upper()) - ord('A')
 print(tablero)
