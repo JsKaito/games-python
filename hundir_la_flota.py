@@ -13,15 +13,14 @@ import numpy as np
 import random as rd
 
 tamaño = 10
-letras = "ABCDEFGHIJ"
 opcionesIA, opcionesUser = [], []
 
 
 # Creación de array de coordenadas completas (Para reducir las opciones de coordenadas cuando se vayan usando)
 for i in range(1, tamaño + 1):
-    for char in letras:
-        opcionesIA.append((char, i))
-        opcionesUser.append((char, i))
+    for letra in "ABCDEFGHIJ":
+        opcionesIA.append((letra, i))
+        opcionesUser.append((letra, i))
         
 # Función de creación del tablero
 def crearTablero(tamaño):
@@ -40,25 +39,27 @@ def actualizarMovimientos(movimiento, esUsuario): # FALTA DECLARAR MOVIMIENTO
 
 
 # Función de pensamiento de movimiento de IA
-def pensarMovimiento(tableroUsuario):
+def pensarMovimiento(opcionesUser):
     
-    while True:
-        
-        if ultimoMovimiento == 0:
-            
-            # Movimiento completo al azar para ponerlo si el ultimo movimiento fue un fallo
-            nuevoMovimiento = (rd.choice("ABCDEFGHIJ"), rd.randint(1, 10))
-            if nuevoMovimiento not in movimientosHechosIA:
-                break
-        
-        elif ultimoMovimiento == 1:
+    ultimoMovimiento = 0 # Test
+    if ultimoMovimiento == 0 or ultimoMovimiento == 2:
+
+        nuevoMovimiento = rd.choice(opcionesIA)
+        print(nuevoMovimiento)
+
+    # TODO Cambiar estado de hundido para mismo que fallo, desarrollar lógica de IA en tocado.
+    # TODO Desarrollar lógica de movimientos verticales u horizontales en tocado.
+    # TODO Desarrollar lógica de movimientos y guardado de ellos.
+    # TODO Desarrollar lógica de eliminación de duplas en tableros.
+    
+    elif ultimoMovimiento == 1:
             print() # Tocado
         
-        elif ultimoMovimiento == 2:
+    elif ultimoMovimiento == 2:
             print() # Hundido
             
             
-print(coordsIA)
+pensarMovimiento(opcionesUser)
             
 '''
 tableroIA = crearTablero(10)
@@ -85,4 +86,3 @@ movimiento = (1, "A")
 # TODO (No asignado): Función de ataque del usuario / IA
 # TODO (Fer): Función para colocar barcos de la IA
 # TODO (Fer):  Función de pensar el ataque de la IA
-
