@@ -15,7 +15,9 @@ import random as rd
 # ! ZONA DEBUG
 tamaño = 10
 opcionesIA, opcionesUser = [], []
-movimiento =("A", 1)
+movimiento = ("A", 1)
+barcos = [5, 4, 3, 3, 2]
+ultimoMovimiento = 0
 
 
 
@@ -93,17 +95,27 @@ def obtenerVecinos(coordenada):
 # Función de pensamiento de movimiento de IA
 def pensarMovimiento(opcionesUser):
     
-    ultimoMovimiento = 0 # Test
-    if ultimoMovimiento == 0 or ultimoMovimiento == 2:
+    if ultimoMovimiento == 0:
 
         return rd.choice(opcionesIA)
+    
+    
+    elif ultimoMovimiento == 2:
+        
+        barcos.remove() # TODO En función de ataque, si un barco es hundido, verificar que barco es y eliminarlo del array (por valor).
+        
+        
 
     # TODO Desarrollar lógica de movimientos verticales u horizontales en tocado.
     # TODO Desarrollar lógica de movimientos y guardado de ellos.
     # TODO Desarrollar lógica de eliminación de duplas en tableros.
     
     elif ultimoMovimiento == 1:
-        rd.choice(obtenerVecinos(movimiento))
+        if barcos.size != 1:
+            rd.choice(obtenerVecinos(movimiento))
+        else:
+            print()
+            # TODO Lógica que mire cuando quede un solo barco, qué barco es y los límites de él para descartar opciones que no quepan en el tablero
         
         
             
