@@ -12,8 +12,11 @@
 import numpy as np
 import random as rd
 
+# ! ZONA DEBUG
 tamaño = 10
 opcionesIA, opcionesUser = [], []
+movimiento =("A", 1)
+
 
 
 # Creación de array de coordenadas completas (Para reducir las opciones de coordenadas cuando se vayan usando)
@@ -38,25 +41,73 @@ def actualizarMovimientos(movimiento, esUsuario): # FALTA DECLARAR MOVIMIENTO
         movimientosHechosIA.append(movimiento) # VIENE DE LA FUNCIÓN DE ATAQUE
 
 
+def obtenerVecinos(coordenada):
+    
+    """
+    Obtiene las coordenadas vecinas válidas (arriba, abajo, izquierda, derecha).
+
+    Args:
+        coordenada (tuple): Tupla (Letra, Fila) de la posición central.
+
+    Returns:
+        list: Lista de coordenadas adyacentes dentro del tablero.
+    """
+    
+    letra, fila = coordenada
+    vecinos = []
+
+    # Letra : Dupla(Izquierda, Derecha)
+    adyacentes = {
+        'A': (None, 'B'),
+        'B': ('A', 'C'),
+        'C': ('B', 'D'),
+        'D': ('C', 'E'),
+        'E': ('D', 'F'),
+        'F': ('E', 'G'),
+        'G': ('F', 'H'),
+        'H': ('G', 'I'),
+        'I': ('H', 'J'),
+        'J': ('I', None)
+    }
+
+    # Mirar arriba y abajo
+    if fila > 1:
+        vecinos.append((letra, fila - 1))
+    if fila < 10:
+        vecinos.append((letra, fila + 1))
+
+    # Mirar iquierda y derecha
+    izquierda, derecha = adyacentes[letra]
+    
+    if izquierda:
+        vecinos.append((izquierda, fila))
+    if derecha:
+        vecinos.append((derecha, fila))
+
+    for vecino in vecinos:
+        if vecino not in opcionesIA:
+            vecinos.remove(vecino)
+
+    return vecinos
+
 # Función de pensamiento de movimiento de IA
 def pensarMovimiento(opcionesUser):
     
     ultimoMovimiento = 0 # Test
     if ultimoMovimiento == 0 or ultimoMovimiento == 2:
 
-        nuevoMovimiento = rd.choice(opcionesIA)
-        print(nuevoMovimiento)
+        return rd.choice(opcionesIA)
 
-    # TODO Cambiar estado de hundido para mismo que fallo, desarrollar lógica de IA en tocado.
     # TODO Desarrollar lógica de movimientos verticales u horizontales en tocado.
     # TODO Desarrollar lógica de movimientos y guardado de ellos.
     # TODO Desarrollar lógica de eliminación de duplas en tableros.
     
     elif ultimoMovimiento == 1:
-            print() # Tocado
+        rd.choice(obtenerVecinos(movimiento))
         
-    elif ultimoMovimiento == 2:
-            print() # Hundido
+        
+            
+
             
             
 pensarMovimiento(opcionesUser)
