@@ -19,7 +19,7 @@ movimiento = ("A", 1)
 barcos = [5, 4, 3, 3, 2]
 ultimoMovimiento = 0
 
-
+# TODO Cambiar lógica básica del programa para sustituir el 1/0 por barcos distintos con distintos valores (para facilitar lógica IA final)
 
 # Creación de array de coordenadas completas (Para reducir las opciones de coordenadas cuando se vayan usando)
 for i in range(1, tamaño + 1):
@@ -72,13 +72,13 @@ def obtenerVecinos(coordenada):
         'J': ('I', None)
     }
 
-    # Mirar arriba y abajo
+    # Mirar si arriba y abajo son válidos
     if fila > 1:
         vecinos.append((letra, fila - 1))
     if fila < 10:
         vecinos.append((letra, fila + 1))
 
-    # Mirar iquierda y derecha
+    # Mirar si iquierda y derecha son válidos
     izquierda, derecha = adyacentes[letra]
     
     if izquierda:
@@ -86,23 +86,25 @@ def obtenerVecinos(coordenada):
     if derecha:
         vecinos.append((derecha, fila))
 
-    for vecino in vecinos:
-        if vecino not in opcionesIA:
-            vecinos.remove(vecino)
+    vecinos = [vecino for vecino in vecinos if vecino in opcionesIA] # Toma los vecinos de la lista vecinos que cumplan la condición de estar en opcionesIA (que son válidos)
 
     return vecinos
 
 # Función de pensamiento de movimiento de IA
 def pensarMovimiento(opcionesUser):
     
-    if ultimoMovimiento == 0:
+    if ultimoMovimiento == 0: # Si el anterior fue fallo, el ataque es aleatorio.
 
         return rd.choice(opcionesIA)
     
     
-    elif ultimoMovimiento == 2:
+    elif ultimoMovimiento == 2: # Si el anterior fue hundido, el ataque es aleatorio y el barco se elimina.
         
         barcos.remove() # TODO En función de ataque, si un barco es hundido, verificar que barco es y eliminarlo del array (por valor).
+        
+        
+        
+        return rd.choice(opcionesIA)
         
         
 
@@ -110,8 +112,9 @@ def pensarMovimiento(opcionesUser):
     # TODO Desarrollar lógica de movimientos y guardado de ellos.
     # TODO Desarrollar lógica de eliminación de duplas en tableros.
     
-    elif ultimoMovimiento == 1:
-        if barcos.size != 1:
+    elif ultimoMovimiento == 1: # Si el anterior fue tocado, obtiene los vecinos y los mira uno por uno.
+        
+        if len(barcos) != 1:
             rd.choice(obtenerVecinos(movimiento))
         else:
             print()
