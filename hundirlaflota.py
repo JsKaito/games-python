@@ -35,4 +35,25 @@ for barco, tamano in barcos:
         orientacion = input("Orientación (H/V): ").upper()
 
         fila = ord(fila_letra.upper()) - ord('A')
+        
+        # Comprobar si cabe
+        cabe = True
+
+        if orientacion == "H":
+            if columna + tamano > 10:
+                cabe = False
+        else:
+            if fila + tamano > 10:
+                cabe = False
+                
+        # Comprobar si pisa otro barco
+        if cabe:
+            if orientacion == "H":
+                for i in range(tamano):
+                    if tablero[fila][columna + i] == 1:
+                        cabe = False
+            else:
+                for i in range(tamano):
+                    if tablero[fila + i][columna] == 1:
+                        cabe = False
 print(tablero)
