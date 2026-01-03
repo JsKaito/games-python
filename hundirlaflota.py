@@ -1,9 +1,11 @@
 import numpy as np
 
 # Crear tablero
+
 tablero = np.zeros((10, 10), dtype=int)
 
 # Lista de barcos (nombre, tamaño)
+
 barcos = [
     ("Portaaviones", 5),
     ("Acorazado", 4),
@@ -18,6 +20,7 @@ for barco, tamano in barcos:
     while not colocado:
 
         # Mostrar tablero
+        
         print("\n  1 2 3 4 5 6 7 8 9 10")
         for i in range(10):
             print(chr(ord('A') + i), end=" ")
@@ -29,7 +32,9 @@ for barco, tamano in barcos:
             print()
 
         print(f"\nColoca tu {barco} (tamaño {tamano})")
+        
         # Pedir datos
+        
         fila_letra = input("Fila (A-J): ")
         columna = int(input("Columna (1-10): ")) - 1
         orientacion = input("Orientación (H/V): ").upper()
@@ -37,6 +42,7 @@ for barco, tamano in barcos:
         fila = ord(fila_letra.upper()) - ord('A')
         
         # Comprobar si cabe
+        
         cabe = True
 
         if orientacion == "H":
@@ -47,6 +53,7 @@ for barco, tamano in barcos:
                 cabe = False
                 
         # Comprobar si pisa otro barco
+        
         if cabe:
             if orientacion == "H":
                 for i in range(tamano):
@@ -56,4 +63,16 @@ for barco, tamano in barcos:
                 for i in range(tamano):
                     if tablero[fila + i][columna] == 1:
                         cabe = False
-print(tablero)
+                        
+        # Colocar barco
+        
+        if cabe:
+            if orientacion == "H":
+                for i in range(tamano):
+                    tablero[fila][columna + i] = 1
+            else:
+                for i in range(tamano):
+                    tablero[fila + i][columna] = 1
+            colocado = True
+        else:
+            print("No se puede colocar ahí. Intentalo de nuevo.")
