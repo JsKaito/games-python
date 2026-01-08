@@ -18,6 +18,7 @@ opcionesIA, opcionesUser = [], []
 movimiento = ("A", 1)
 barcos = [5, 4, 3, 3, 2]
 ultimoMovimiento = 0
+movimientosHechosIA, movimientosHechosUsuario = [], []
 
 # TODO Cambiar lógica básica del programa para sustituir el 1/0 por barcos distintos con distintos valores (para facilitar lógica IA final)
 
@@ -29,6 +30,14 @@ for i in range(1, tamaño + 1):
         
 # Función de creación del tablero
 def crearTablero(tamaño):
+    '''Creación de los tableros vacíos
+
+    Args:
+        tama (int): Tamaño de los tableros
+
+    Returns:
+        tablero (ndarray): Array bidimensional de numpy lleno de 0.
+    '''
 
     tablero = np.zeros((tamaño, tamaño), dtype=int)
     return tablero
@@ -36,6 +45,12 @@ def crearTablero(tamaño):
 
 
 def actualizarMovimientos(movimiento, esUsuario): # FALTA DECLARAR MOVIMIENTO
+    '''Función para actualizar movimientos
+
+    Args:
+        movimiento (tuple): Representa la coordenada ('X', 0)
+        esUsuario (boolean): Verifica si ataca el usuario (true) o la IA (false)
+    '''
     
     if esUsuario:
         movimientosHechosUsuario.append(movimiento)
@@ -44,16 +59,14 @@ def actualizarMovimientos(movimiento, esUsuario): # FALTA DECLARAR MOVIMIENTO
 
 
 def obtenerVecinos(coordenada):
-    
-    """
-    Obtiene las coordenadas vecinas válidas (arriba, abajo, izquierda, derecha).
+    '''Función que obtiene las coordenadas adyacentes a otra
 
     Args:
-        coordenada (tuple): Tupla (Letra, Fila) de la posición central.
+        coordenada (tuple): Representa la coordenada ('X', 0)
 
     Returns:
-        list: Lista de coordenadas adyacentes dentro del tablero.
-    """
+        vecinos (array): Lista de coordenadas adyacentes
+    '''
     
     letra, fila = coordenada
     vecinos = []
@@ -91,20 +104,26 @@ def obtenerVecinos(coordenada):
     return vecinos
 
 # Función de pensamiento de movimiento de IA
-def pensarMovimiento(opcionesUser):
+def pensarMovimiento(opcionesIA):
+    '''Función para pensar el movimiento de la IA
+
+    Args:
+        opcionesIA (array): Almacena las ocpiones de coordenadas posibles que puede realizar la IA
+
+    Returns:
+        eleccion (tuple): Coordenada seleccionada tras un proceso de pensamiento
+    '''
     
     if ultimoMovimiento == 0: # Si el anterior fue fallo, el ataque es aleatorio.
 
-        return rd.choice(opcionesIA)
+        eleccion = rd.choice(opcionesIA)
     
     
     elif ultimoMovimiento == 2: # Si el anterior fue hundido, el ataque es aleatorio y el barco se elimina.
         
         barcos.remove() # TODO En función de ataque, si un barco es hundido, verificar que barco es y eliminarlo del array (por valor).
         
-        
-        
-        return rd.choice(opcionesIA)
+        eleccion = rd.choice(opcionesIA)
         
         
 
@@ -120,10 +139,7 @@ def pensarMovimiento(opcionesUser):
             print()
             # TODO Lógica que mire cuando quede un solo barco, qué barco es y los límites de él para descartar opciones que no quepan en el tablero
         
-        
-            
-
-            
+    return eleccion            
             
 pensarMovimiento(opcionesUser)
             
