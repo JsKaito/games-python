@@ -16,7 +16,7 @@ import random as rd
 tamaño = 10
 opcionesIA, opcionesUser = [], []
 movimiento = ("A", 1)
-barcos = [5, 4, 3, 3, 2]
+barcos = [5, 4, 3, 3.2, 2]
 ultimoMovimiento = 0
 movimientosHechosIA, movimientosHechosUsuario = [], []
 
@@ -103,6 +103,19 @@ def obtenerVecinos(coordenada):
 
     return vecinos
 
+def obtenerOrientacion(tocados):
+    coordsX = [x for x, y in tocados]
+    coordsY = [y for x, y in tocados]
+    
+    if len(set(coordsX)) == 1: # Si todas las x de las coordenadas coinciden
+        return "vertical"
+    if len(set(coordsY)) == 1: # Si todas las y de las coordenadas coinciden
+        return "horizontal"
+    #TODO Usar la misma función para determinar el ataque cuando quedan múltiples barcos, si se dan 2 ataques en horizontal como tocados, continuar en horizontal.
+    
+def posicionesValidas(tablero, ultimoBarco): #TODO Función que determine cuál es el último barco que falta.
+    print("SEGUIR AQUI SLGDJKLHGJKLGFBLJKKGJL")
+
 # Función de pensamiento de movimiento de IA
 def pensarMovimiento(opcionesIA):
     '''Función para pensar el movimiento de la IA
@@ -118,7 +131,7 @@ def pensarMovimiento(opcionesIA):
 
         eleccion = rd.choice(opcionesIA)
     
-    
+    # ! DEPRECADO
     elif ultimoMovimiento == 2: # Si el anterior fue hundido, el ataque es aleatorio y el barco se elimina.
         
         barcos.remove() # TODO En función de ataque, si un barco es hundido, verificar que barco es y eliminarlo del array (por valor).
@@ -131,15 +144,19 @@ def pensarMovimiento(opcionesIA):
     # TODO Desarrollar lógica de movimientos y guardado de ellos.
     # TODO Desarrollar lógica de eliminación de duplas en tableros.
     
-    elif ultimoMovimiento == 1: # Si el anterior fue tocado, obtiene los vecinos y los mira uno por uno.
+    elif ultimoMovimiento in barcos: # Si el anterior fue tocado, obtiene los vecinos y los mira uno por uno.
+        
+        print("OPONENTE: ¡He tocado un barco!")
         
         if len(barcos) != 1:
             rd.choice(obtenerVecinos(movimiento))
         else:
             print()
             # TODO Lógica que mire cuando quede un solo barco, qué barco es y los límites de él para descartar opciones que no quepan en el tablero
+            match ultimoMovimiento:
+                case 3.2:
         
-    return eleccion            
+    return eleccion
             
 pensarMovimiento(opcionesUser)
             
@@ -165,6 +182,6 @@ movimiento = (1, "A")
 
 
 # TODO (Lucia): Función para colocar barcos del usuario -- Lucia
-# TODO (No asignado): Función de ataque del usuario / IA
+# TODO (Rocío): Función de ataque del usuario / IA
 # TODO (Fer): Función para colocar barcos de la IA
-# TODO (Fer):  Función de pensar el ataque de la IA
+# TODO (Fer): Función de pensar el ataque de la IA
