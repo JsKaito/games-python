@@ -126,42 +126,8 @@ def obtenerOrientacion(tocados):
 
     #TODO Usar la misma función para determinar el ataque cuando quedan múltiples barcos, si se dan 2 ataques en horizontal como tocados, continuar en horizontal.
     
-def posiciones_validas(letras, tamaño, tablero, tamañoBarco):
-    """
-    Función que devuelve todas las posiciones válidas para colocar un barco
-
-    Args:
-        letras (list): Lista de letras
-        tamaño (int): Tamaño del tablero
-        tablero (ndarray): Array bidimensional de numpy
-        tamañoBarco (int): Tamaño del barco
-
-    Returns:
-        validas (list): Lista de tuplas con posiciones válidas (letra, número, 'H'/'V')
-
-    """
-    validas = []
-
-    # Horizontal
-    for fila in range(tamaño):
-        for col in range(tamaño - tamañoBarco + 1):
-            # Extraer tramo horizontal
-            tramo = tablero[fila, col:col+tamañoBarco]
-            if np.all(tramo == 0):
-                letra_inicio = letras[col]
-                validas.append((letra_inicio, fila, 'H'))
-
-    # Vertical
-    for fila in range(tamaño - tamañoBarco + 1):
-        for col in range(tamaño):
-            tramo = tablero[fila:fila+tamañoBarco, col]
-            if np.all(tramo == 0):
-                letra_inicio = letras[col]
-                validas.append((letra_inicio, fila, 'V'))
-                
-                # ! CREO QUE SI UNA CASILLA ES VÁLIDA EN H Y V, SEGÚN MI CÓDIGO SE AÑADE DOS VECES Y SI SE FALLA, PUEDE VOLVER A ATACAR A LA CASILLA, COMPROBAR Y CAMBIAR.
-
-    return validas
+# ! LA FUNCIÓN ELIMINADA NO FUNCIONABA YA QUE INCLUÍA LA MISMA COORDENADA VARIAS VECES POR LO QUE ATACABA CASILLAS VACÍAS. ELIMINADA DE RAÍZ
+#TODO Función de ataque según probabilidades
 
 # Función de pensamiento de movimiento de IA
 def pensarMovimiento(opcionesIA):
