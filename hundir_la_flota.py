@@ -42,7 +42,7 @@ def crearTablero(tamaño):
     tablero = np.zeros((tamaño, tamaño), dtype=int)
     return tablero
     
-
+tablero = crearTablero(10)
 
 def actualizarMovimientos(movimiento, esUsuario): # FALTA DECLARAR MOVIMIENTO
     '''Función para actualizar movimientos
@@ -104,17 +104,64 @@ def obtenerVecinos(coordenada):
     return vecinos
 
 def obtenerOrientacion(tocados):
-    coordsX = [x for x, y in tocados]
-    coordsY = [y for x, y in tocados]
-    
-    if len(set(coordsX)) == 1: # Si todas las x de las coordenadas coinciden
+    """
+    Función que obtiene la orientación de los tocados
+
+    Args:
+        tocados (tuple array): Lista de coordenadas tocadas
+
+    Returns:
+        horizontal // vertical
+    """
+    letras = [letra for letra, num in tocados]
+    numeros = [num for letra, num in tocados]
+
+    if len(set(letras)) == 1:
         return "vertical"
-    if len(set(coordsY)) == 1: # Si todas las y de las coordenadas coinciden
+    elif len(set(numeros)) == 1:
         return "horizontal"
+    else:
+        # caso de más de un barco o ataque disperso
+        return None
+
     #TODO Usar la misma función para determinar el ataque cuando quedan múltiples barcos, si se dan 2 ataques en horizontal como tocados, continuar en horizontal.
     
-def posicionesValidas(tablero, ultimoBarco): #TODO Función que determine cuál es el último barco que falta.
-    print("SEGUIR AQUI SLGDJKLHGJKLGFBLJKKGJL")
+def posiciones_validas(letras, tamaño, tablero, tamañoBarco):
+    """
+    Función que devuelve todas las posiciones válidas para colocar un barco
+
+    Args:
+        letras (list): Lista de letras
+        tamaño (int): Tamaño del tablero
+        tablero (ndarray): Array bidimensional de numpy
+        tamañoBarco (int): Tamaño del barco
+
+    Returns:
+        validas (list): Lista de tuplas con posiciones válidas (letra, número, 'H'/'V')
+
+    """
+    validas = []
+
+    # Horizontal
+    for fila in range(tamaño):
+        for col in range(tamaño - tamañoBarco + 1):
+            # Extraer tramo horizontal
+            tramo = tablero[fila, col:col+tamañoBarco]
+            if np.all(tramo == 0):
+                letra_inicio = letras[col]
+                validas.append((letra_inicio, fila, 'H'))
+
+    # Vertical
+    for fila in range(tamaño - tamañoBarco + 1):
+        for col in range(tamaño):
+            tramo = tablero[fila:fila+tamañoBarco, col]
+            if np.all(tramo == 0):
+                letra_inicio = letras[col]
+                validas.append((letra_inicio, fila, 'V'))
+                
+                # ! CREO QUE SI UNA CASILLA ES VÁLIDA EN H Y V, SEGÚN MI CÓDIGO SE AÑADE DOS VECES Y SI SE FALLA, PUEDE VOLVER A ATACAR A LA CASILLA, COMPROBAR Y CAMBIAR.
+
+    return validas
 
 # Función de pensamiento de movimiento de IA
 def pensarMovimiento(opcionesIA):
@@ -155,6 +202,7 @@ def pensarMovimiento(opcionesIA):
             # TODO Lógica que mire cuando quede un solo barco, qué barco es y los límites de él para descartar opciones que no quepan en el tablero
             match ultimoMovimiento:
                 case 3.2:
+                    print(SEGUIR AQUI TMABIEN)
         
     return eleccion
             
