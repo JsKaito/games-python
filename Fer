@@ -1,1 +1,118 @@
-test
+def obtener_mapa_probabilidades(letras, tamaño, tablero, barcos_restantes):
+    """
+    Genera un mapa de calor con probabilidades para TODOS los barcos restantes
+    
+    Args:
+        letras (list): Lista de letras del tablero
+        tamaño (int): Tamaño del tablero
+        tablero (ndarray): Estado actual del tablero
+        barcos_restantes (list): Lista con tamaños de barcos que quedan por hundir
+                                 Ejemplo: [5, 4, 3, 2] si quedan 4 barcos
+    
+    Returns:
+        ndarray: Matriz de probabilidades (misma forma que tablero)
+    """
+    from collections import defaultdict
+    
+    probabilidades = defaultdict(int)
+    
+    # Para CADA barco restante, calcular posiciones válidas
+    for tamañoBarco in barcos_restantes:
+        
+        # Horizontal
+        for fila in range(tamaño):
+            for col in range(tamaño - tamañoBarco + 1):
+                tramo = tablero[fila, col:col+tamañoBarco]
+                if np.all(tramo == 0):  # Casillas vacías (no atacadas)
+                    for i in range(tamañoBarco):
+                        probabilidades[(col+i, fila)] += 1
+        
+        # Vertical
+        for fila in range(tamaño - tamañoBarco + 1):
+            for col in range(tamaño):
+                tramo = tablero[fila:fila+tamañoBarco, col]
+                if np.all(tramo == 0):
+                    for i in range(tamañoBarco):
+                        probabilidades[(col, fila+i)] += 1
+    
+    # Convertir a matriz numpy para visualización
+    mapa_calor = np.zeros((tamaño, tamaño))
+    for (col, fila), prob in probabilidades.items():
+        mapa_calor[fila, col] = prob
+    
+    return mapa_calor
+
+
+def obtener_mejor_ataque(letras, tamaño, tablero, barcos_restantes):
+    """
+    Devuelve la mejor casilla para atacar basándose en probabilidades
+    """
+    import random
+    
+    mapa_calor = obtener_mapa_probabilidades(letras, tamaño, tablero, barcos_restantes)
+    
+    # Encontrar casillas con probabilidad máxima
+    max_prob = np.max(mapa_calor)
+    
+    if max_prob == 0:
+        return None  # No hay movimientos válidos
+    
+    # Obtener todas las posiciones con probabilidad máxima
+    posiciones_max = np.argwhere(mapa_calor == max_prob)
+    
+    # Elegir aleatoriamente entre las mejores
+    fila, col = posiciones_max[random.choice(range(len(posiciones_max)))]
+    
+    return (letras[col], fila)
+
+
+# Al inicio del juego
+barcos_restantes = [5, 4, 3, 3, 2]  # Ejemplo: portaaviones, acorazado, etc.
+
+# En cada turno de la IA:
+casilla = obtener_mejor_ataque(letras, tamaño, tablero_ia, barcos_restantes)
+
+if casilla:
+    letra, numero = casilla
+    resultado = atacar(letra, numero)
+    
+    if resultado == "HUNDIDO":
+        # Remover el barco hundido de la lista
+        # (necesitarás saber qué tamaño tenía el barco hundido)
+        barcos_restantes.remove(tamaño_barco_hundido)
+        
+        
+def obtener_mejor_ataque_inteligente(letras, tamaño, tablero, barcos_restantes, casillas_tocadas):
+    """
+    IA mejorada que cambia de estrategia según el contexto
+    
+    Args:
+        casillas_tocadas (list): Lista de tuplas (col, fila) donde hay barcos tocados pero no hundidos
+    """
+    import random
+    
+    # MODO CACERÍA: Si hay casillas tocadas, atacar adyacentes
+    if casillas_tocadas:
+        candidatos = []
+        
+        for col, fila in casillas_tocadas:
+            # Comprobar casillas adyacentes (arriba, abajo, izquierda, derecha)
+            adyacentes = [
+                (col, fila-1),  # Arriba
+                (col, fila+1),  # Abajo
+                (col-1, fila),  # Izquierda
+                (col+1, fila),  # Derecha
+            ]
+            
+            for c, f in adyacentes:
+                # Verificar que está dentro del tablero y no ha sido atacada
+                if 0 <= c < tamaño and 0 <= f < tamaño and tablero[f, c] == 0:
+                    candidatos.append((c, f))
+        
+        if candidatos:
+            # Si hay varias casillas tocadas en línea, priorizar la dirección
+            col, fila = random.choice(candidatos)
+            return (letras[col], fila)
+    
+    # MODO BÚSQUEDA: Usar probabilidades normales
+    return obtener_mejor_ataque(letras, tamaño, tablero, barcos_restantes)
