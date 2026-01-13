@@ -117,10 +117,10 @@ def obtenerOrientacion(tocados):
 def hunt(casillasTocadas):
     
     '''
-    La IA iniciará un modo cacería siempre que queden casillas en estado "hundido"
+    La IA iniciará un modo cacería siempre que queden casillas en estado "tocado"
     
     Args:
-        casillasTocadas (tuple list): Lista de tuplas de casillas hundidas
+        casillasTocadas (tuple list): Lista de tuplas de casillas tocado
     '''
     
     posiblesAtaques = []
