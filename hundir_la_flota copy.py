@@ -58,35 +58,50 @@ def actualizarMovimientos(movimiento, esUsuario): # FALTA DECLARAR MOVIMIENTO
         movimientosHechosIA.append(movimiento) # VIENE DE LA FUNCIÓN DE ATAQUE
 
 
-def obtenerAdyacentes(coordenada, opcionesIA):
+def obtenerVecinos(coordenada):
     '''Función que obtiene las coordenadas adyacentes a otra
 
     Args:
-        coordenada (tuple): Representa la coordenada (x, y)
-        opcionesIA (tuple list): Contiene las opciones válidas que puede realizar la IA.
+        coordenada (tuple): Representa la coordenada ('X', 0)
 
     Returns:
-        adyacentes (array): Lista de coordenadas adyacentes
+        vecinos (array): Lista de coordenadas adyacentes
     '''
     
-    x, y = coordenada
-    adyacentes = []
+    letra, fila = coordenada
+    vecinos = []
 
-    # Mirar si izquierda y derecha son válidos
-    if x != 1:
-        adyacentes.append((x-1, y))
-    if x != 10:
-        adyacentes.append((x+1, y))
+    # Letra : Dupla(Izquierda, Derecha)
+    adyacentes = {
+        'A': (None, 'B'),
+        'B': ('A', 'C'),
+        'C': ('B', 'D'),
+        'D': ('C', 'E'),
+        'E': ('D', 'F'),
+        'F': ('E', 'G'),
+        'G': ('F', 'H'),
+        'H': ('G', 'I'),
+        'I': ('H', 'J'),
+        'J': ('I', None)
+    }
 
     # Mirar si arriba y abajo son válidos
-    if y != 1:
-        adyacentes.append((x, y-1))
-    if y != 10:
-        adyacentes.append((x, y+1))
+    if fila > 1:
+        vecinos.append((letra, fila - 1))
+    if fila < 10:
+        vecinos.append((letra, fila + 1))
 
-    adyacentes = [adyacente for adyacente in adyacentes if adyacente in opcionesIA] # Toma los adyacentes de la lista adyacentes que cumplan la condición de estar en opcionesIA (que son válidos)
+    # Mirar si iquierda y derecha son válidos
+    izquierda, derecha = adyacentes[letra]
+    
+    if izquierda:
+        vecinos.append((izquierda, fila))
+    if derecha:
+        vecinos.append((derecha, fila))
 
-    return adyacentes
+    vecinos = [vecino for vecino in vecinos if vecino in opcionesIA] # Toma los vecinos de la lista vecinos que cumplan la condición de estar en opcionesIA (que son válidos)
+
+    return vecinos
 
 def obtenerOrientacion(tocados):
     """
@@ -114,27 +129,62 @@ def obtenerOrientacion(tocados):
 # ! LA FUNCIÓN ELIMINADA NO FUNCIONABA YA QUE INCLUÍA LA MISMA COORDENADA VARIAS VECES POR LO QUE ATACABA CASILLAS VACÍAS. ELIMINADA DE RAÍZ
 #TODO Función de ataque según probabilidades
 
-def hunt(casillasTocadas):
-    
-    '''
-    La IA iniciará un modo cacería siempre que queden casillas en estado "hundido"
-    
+# Función de pensamiento de movimiento de IA
+def pensarMovimiento(opcionesIA):
+    '''Función para pensar el movimiento de la IA
+
     Args:
-        casillasTocadas (tuple list): Lista de tuplas de casillas hundidas
+        opcionesIA (array): Almacena las ocpiones de coordenadas posibles que puede realizar la IA
+
+    Returns:
+        eleccion (tuple): Coordenada seleccionada tras un proceso de pensamiento
     '''
     
-    posiblesAtaques = []
+    if ultimoMovimiento == 0: # Si el anterior fue fallo, el ataque es aleatorio.
+
+        eleccion = rd.choice(opcionesIA)
     
-    if casillasTocadas: # If en un array comprueba si hay elementos en él
+    # ! DEPRECADO
+    elif ultimoMovimiento == 2: # Si el anterior fue hundido, el ataque es aleatorio y el barco se elimina.
         
-        for casilla in casillasTocadas:
-            adyacentes = obtenerAdyacentes(casilla)
-            posiblesAtaques.extend(adyacentes)
+        barcos.remove() # TODO En función de ataque, si un barco es hundido, verificar que barco es y eliminarlo del array (por valor).
+        
+        eleccion = rd.choice(opcionesIA)
+        
+        
+
+    # TODO Desarrollar lógica de movimientos verticales u horizontales en tocado.
+    # TODO Desarrollar lógica de movimientos y guardado de ellos.
+    # TODO Desarrollar lógica de eliminación de duplas en tableros.
     
-    #TODO Desarrollar el modo caza de la ia. Llamarla en la función de cada ataque si quedan casillas tocadas. 
-    #TODO Las casillas tocadas vendrán de la función de ataque por probabilidades.
-    
-    
+    elif ultimoMovimiento in barcos: # Si el anterior fue tocado, obtiene los vecinos y los mira uno por uno.
+        
+        print("OPONENTE: ¡He tocado un barco!")
+        
+        if len(barcos) != 1:
+            rd.choice(obtenerVecinos(movimiento))
+        else:
+            print()
+            # TODO Lógica que mire cuando quede un solo barco, qué barco es y los límites de él para descartar opciones que no quepan en el tablero
+            match ultimoMovimiento:
+                case 3.2:
+                    print("seguir aqui")
+        
+    return eleccion
+            
+pensarMovimiento(opcionesUser)
+            
+'''
+tableroIA = crearTablero(10)
+tableroUsuario = crearTablero(10)
+movimientosHechosIA, movimientosHechosUsuario = [], []
+
+# 0 = FALLO
+# 1 = TOCADO
+# 2 = HUNDIDO
+
+movimiento = (1, "A")
+        '''
 
 # TODO: Patrón último movimiento para programación de la IA
 # TODO: Arrays de todos los movimientos y movimientos ya hechos para optimizar el pensamiento de la IA y que no funcione con brute-force.

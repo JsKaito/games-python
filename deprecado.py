@@ -65,3 +65,10 @@ movimientosHechosIA, movimientosHechosUsuario = [], []
 # 2 = HUNDIDO
 
 movimiento = (1, "A")
+
+
+for casilla in casillasTocadas:
+    adyacentes = obtenerAdyacentes(casilla)
+            
+    for coordenada in adyacentes:
+        posiblesAtaques.append(coordenada)
