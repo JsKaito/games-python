@@ -113,7 +113,7 @@ def obtenerOrientacion(tocados):
 # ! LA FUNCIÓN ELIMINADA NO FUNCIONABA YA QUE INCLUÍA LA MISMA COORDENADA VARIAS VECES POR LO QUE ATACABA CASILLAS VACÍAS. ELIMINADA DE RAÍZ
 #TODO Función de ataque según probabilidades
 
-def hunt(casillasTocadas):
+def hunt(casillasTocadas, opcionesIA):
     
     '''
     La IA iniciará un modo cacería siempre que queden casillas en estado "tocado"
@@ -122,33 +122,32 @@ def hunt(casillasTocadas):
         casillasTocadas (tuple list): Lista de tuplas de casillas tocado
     '''
     
-    posiblesAtaques = []
+    if not casillasTocadas: # If en un array comprueba si hay elementos en él
+        return []
     
-    if casillasTocadas: # If en un array comprueba si hay elementos en él
+    posiblesAtaques, xs, ys = set(), set(), set()
+    
+    if casillasTocadas >= 2: # Línea
+        xs = [x for x, y in casillasTocadas]
+        ys = [y for x, y in casillasTocadas]
         
-        for casillaTocada in casillasTocadas:
-            adyacentes = obtenerAdyacentes(casillaTocada)
+        if len(ys) == 1: # Si las 'y' son iguales, el barco está horizontal
+            y = ys[0]
+            xmin = min(xs)
+            xmax = max(xs)
+            posiblesAtaques.add((xmin - 1, y), (xmax + 1, y))
             
-            for casillaAdyacente in adyacentes:
-                
-                if casillaAdyacente in casillasTocadas:
-                    x1, y1 = casillaTocada
-                    x2, y2 = casillaAdyacente
-                    
-                    if x1 == x2:
-                        if y1 - 1 == y2:
-                            posiblesAtaques.append((x1, y1 + 1))
-                        elif y1 + 1 == y2:
-                            posiblesAtaques.append((x1, y1 - 1))
-                    
-                    elif y1 == y2:
-                        if x1 - 1 == x2:
-                            posiblesAtaques.append((x1 + 1, y1))
-                        elif x1 + 1 == x2:
-                            posiblesAtaques.append((x1 - 1, y1))
-                        
-                else:
-                    posiblesAtaques.extend(adyacentes)
+        if len(xs) == 1: # Si las 'y' son iguales, el barco está horizontal
+            x = xs[0]
+            ymin = min(ys)
+            ymax = max(ys)
+            posiblesAtaques.add((x, ymin - 1), (x, ymax + 1))
+
+    if not posiblesAtaques: # Sin dirección
+        for tocado in casillasTocadas:
+            posiblesAtaques.update(obtenerAdyacentes(tocado, opcionesIA))
+            
+        
             
         
     
