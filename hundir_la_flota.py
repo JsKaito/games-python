@@ -19,6 +19,7 @@ movimiento = ("A", 1)
 barcos = [5, 4, 3, 3.2, 2]
 ultimoMovimiento = 0
 movimientosHechosIA, movimientosHechosUsuario = [], []
+objetivos = []
 
 # TODO Cambiar lógica básica del programa para sustituir el 1/0 por barcos distintos con distintos valores (para facilitar lógica IA final)
 
@@ -84,8 +85,6 @@ def obtenerAdyacentes(coordenada, opcionesIA):
     if y != 10:
         adyacentes.append((x, y+1))
 
-    adyacentes = [adyacente for adyacente in adyacentes if adyacente in opcionesIA] # Toma los adyacentes de la lista adyacentes que cumplan la condición de estar en opcionesIA (que son válidos)
-
     return adyacentes
 
 def obtenerOrientacion(tocados):
@@ -127,9 +126,31 @@ def hunt(casillasTocadas):
     
     if casillasTocadas: # If en un array comprueba si hay elementos en él
         
-        for casilla in casillasTocadas:
-            adyacentes = obtenerAdyacentes(casilla)
-            posiblesAtaques.extend(adyacentes)
+        for casillaTocada in casillasTocadas:
+            adyacentes = obtenerAdyacentes(casillaTocada)
+            
+            for casillaAdyacente in adyacentes:
+                
+                if casillaAdyacente in casillasTocadas:
+                    x1, y1 = casillaTocada
+                    x2, y2 = casillaAdyacente
+                    
+                    if x1 == x2:
+                        if y1 - 1 == y2:
+                            posiblesAtaques.append((x1, y1 + 1))
+                        elif y1 + 1 == y2:
+                            posiblesAtaques.append((x1, y1 - 1))
+                    
+                    elif y1 == y2:
+                        if x1 - 1 == x2:
+                            posiblesAtaques.append((x1 + 1, y1))
+                        elif x1 + 1 == x2:
+                            posiblesAtaques.append((x1 - 1, y1))
+                        
+                else:
+                    posiblesAtaques.extend(adyacentes)
+            
+        
     
     #TODO Desarrollar el modo caza de la ia. Llamarla en la función de cada ataque si quedan casillas tocadas. 
     #TODO Las casillas tocadas vendrán de la función de ataque por probabilidades.

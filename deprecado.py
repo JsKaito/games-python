@@ -72,3 +72,8 @@ for casilla in casillasTocadas:
             
     for coordenada in adyacentes:
         posiblesAtaques.append(coordenada)
+        
+        
+        
+        
+adyacentes = [adyacente for adyacente in adyacentes if adyacente in opcionesIA] # Toma los adyacentes de la lista adyacentes que cumplan la condición de estar en opcionesIA (que son válidos)
