@@ -64,7 +64,7 @@ def obtenerAdyacentes(coordenada, opcionesIA):
 
     Args:
         coordenada (tuple): Representa la coordenada (x, y)
-        opcionesIA (tuple list): Contiene las opciones válidas que puede realizar la IA.
+        opcionesIA (tuple list): Contiene las opciones válidas que puede realizar la IA
 
     Returns:
         adyacentes (array): Lista de coordenadas adyacentes
@@ -119,38 +119,34 @@ def hunt(casillasTocadas, opcionesIA):
     La IA iniciará un modo cacería siempre que queden casillas en estado "tocado"
     
     Args:
-        casillasTocadas (tuple list): Lista de tuplas de casillas tocado
+        casillasTocadas (tuple list): Lista de tuplas de casillas tocadas
     '''
     
-    if not casillasTocadas: # If en un array comprueba si hay elementos en él
+    if not casillasTocadas: # Comprueba si hay elementos en el array
         return []
     
-    posiblesAtaques, xs, ys = set(), set(), set()
-    
-    if casillasTocadas >= 2: # Línea
-        xs = [x for x, y in casillasTocadas]
-        ys = [y for x, y in casillasTocadas]
+    if len(casillasTocadas) >= 2: # Línea
+        xs = {x for x, y in casillasTocadas}
+        ys = {y for x, y in casillasTocadas}
         
-        if len(ys) == 1: # Si las 'y' son iguales, el barco está horizontal
+        if len(ys) == 1: # Si las 'y' son iguales, el barco está en horizontal
             y = ys[0]
-            xmin = min(xs)
-            xmax = max(xs)
-            posiblesAtaques.add((xmin - 1, y), (xmax + 1, y))
+            coords = [(min(xs)-1, y), (max(xs)+1, y)]
             
-        if len(xs) == 1: # Si las 'y' son iguales, el barco está horizontal
+        if len(xs) == 1: # Si las 'x' son iguales, el barco está en vertical
             x = xs[0]
-            ymin = min(ys)
-            ymax = max(ys)
-            posiblesAtaques.add((x, ymin - 1), (x, ymax + 1))
+            coords = [(x, min(ys)-1), (x, max(ys)+1)]
 
-    if not posiblesAtaques: # Sin dirección
+        for coord in coords:
+            if coord not in opcionesIA:
+                coords.remove(coord)
+
+    if not coords: # Sin dirección
         for tocado in casillasTocadas:
-            posiblesAtaques.update(obtenerAdyacentes(tocado, opcionesIA))
+            coords = (obtenerAdyacentes(tocado, opcionesIA))
             
-        
-            
-        
-    
+    posiblesAtaques = coords
+
     #TODO Desarrollar el modo caza de la ia. Llamarla en la función de cada ataque si quedan casillas tocadas. 
     #TODO Las casillas tocadas vendrán de la función de ataque por probabilidades.
     
