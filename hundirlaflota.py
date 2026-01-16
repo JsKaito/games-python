@@ -22,10 +22,10 @@ for barco, tamano in barcos:
         # Mostrar tablero
         
         print("\n  1 2 3 4 5 6 7 8 9 10")
-        for i in range(10):
-            print(chr(ord('A') + i), end=" ")
-            for j in range(10):
-                if tablero[i][j] == 0:
+        for fila in range(10):
+            print(fila + 1, end="  ")
+            for col in range(10):
+                if tablero[fila][col] == 0:
                     print("~", end=" ")
                 else:
                     print("■", end=" ")
@@ -35,11 +35,13 @@ for barco, tamano in barcos:
         
         # Pedir datos
         
-        fila_letra = input("Fila (A-J): ")
+        fila = int(input("Fila (1-10): ")) - 1
         columna = int(input("Columna (1-10): ")) - 1
         orientacion = input("Orientación (H/V): ").upper()
 
-        fila = ord(fila_letra.upper()) - ord('A')
+        if fila < 0 or fila > 9 or columna < 0 or columna > 9:
+            print("Fila o columna fuera del tablero")
+            continue
         
         # Comprobar si cabe
         
@@ -48,9 +50,12 @@ for barco, tamano in barcos:
         if orientacion == "H":
             if columna + tamano > 10:
                 cabe = False
-        else:
+        elif orientacion == "V":
             if fila + tamano > 10:
                 cabe = False
+        else:
+            print("Orientación incorrecta")
+            continue
                 
         # Comprobar si pisa otro barco
         
