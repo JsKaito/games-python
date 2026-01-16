@@ -45,18 +45,18 @@ def crearTablero(tamaño):
     
 tablero = crearTablero(10)
 
-def actualizarMovimientos(movimiento, esUsuario): # FALTA DECLARAR MOVIMIENTO
+def actualizarMovimientos(movimiento, jugador): # FALTA DECLARAR MOVIMIENTO
     '''Función para actualizar movimientos
 
     Args:
-        movimiento (tuple): Representa la coordenada ('X', 0)
-        esUsuario (boolean): Verifica si ataca el usuario (true) o la IA (false)
+        movimiento (tuple): Representa la coordenada (x, y)
+        jugador (string: 'user' / 'ia'): Verifica si ataca el usuario o la IA
     '''
     
     if esUsuario:
-        movimientosHechosUsuario.append(movimiento)
+        opcionesUser.remove(movimiento)
     else:
-        movimientosHechosIA.append(movimiento) # VIENE DE LA FUNCIÓN DE ATAQUE
+        opcionesIA.remove(movimiento) # VIENE DE LA FUNCIÓN DE ATAQUE
 
 
 def obtenerAdyacentes(coordenada, opcionesIA):
@@ -87,31 +87,9 @@ def obtenerAdyacentes(coordenada, opcionesIA):
 
     return adyacentes
 
-def obtenerOrientacion(tocados):
-    """
-    Función que obtiene la orientación de los tocados
-
-    Args:
-        tocados (tuple array): Lista de coordenadas tocadas
-
-    Returns:
-        horizontal // vertical
-    """
-    letras = [letra for letra, num in tocados]
-    numeros = [num for letra, num in tocados]
-
-    if len(set(letras)) == 1:
-        return "vertical"
-    elif len(set(numeros)) == 1:
-        return "horizontal"
-    else:
-        # caso de más de un barco o ataque disperso
-        return None
-
-    #TODO Usar la misma función para determinar el ataque cuando quedan múltiples barcos, si se dan 2 ataques en horizontal como tocados, continuar en horizontal.
-    
-# ! LA FUNCIÓN ELIMINADA NO FUNCIONABA YA QUE INCLUÍA LA MISMA COORDENADA VARIAS VECES POR LO QUE ATACABA CASILLAS VACÍAS. ELIMINADA DE RAÍZ
 #TODO Función de ataque según probabilidades
+def pensarAtaque(casillasTocadas, opcionesIA):
+    
 
 def hunt(casillasTocadas, opcionesIA):
     
@@ -142,13 +120,16 @@ def hunt(casillasTocadas, opcionesIA):
             x = next(iter(xs))
             posiblesAtaques = [(x, min(ys)-1), (x, max(ys)+1)]
 
-    posiblesAtaques = [ataque for ataque in posiblesAtaques if ataque in opcionesIA]
-
-    if not posiblesAtaques: # Sin dirección
+    if not posiblesAtaques: # Si no encuentra línea, devuelve las adyacentes del tocado
         for tocado in casillasTocadas:
             posiblesAtaques.extend(obtenerAdyacentes(tocado, opcionesIA))
-    
+            
+    # Esta línea es List Comprehension. Crea una lista nueva usando una antigua de forma directa, sin necesidad de crear una nueva lista auxiliar
+    # Verifica que la 'x' y la 'y' estén entre 1 y 10 (ya que si no, no está en la lista de opciones posibles), y que la opción sea posible para la IA
+    posiblesAtaques = [opcion for opcion in posiblesAtaques if opcion in opcionesIA]
+
     return posiblesAtaques
+    
     
     #TODO ATACAR DESPUÉS
 

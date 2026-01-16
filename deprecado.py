@@ -77,3 +77,25 @@ for casilla in casillasTocadas:
         
         
 adyacentes = [adyacente for adyacente in adyacentes if adyacente in opcionesIA] # Toma los adyacentes de la lista adyacentes que cumplan la condición de estar en opcionesIA (que son válidos)
+
+
+def obtenerOrientacion(tocados):
+    """
+    Función que obtiene la orientación de los tocados
+
+    Args:
+        tocados (tuple array): Lista de coordenadas tocadas
+
+    Returns:
+        horizontal // vertical
+    """
+    letras = [letra for letra, num in tocados]
+    numeros = [num for letra, num in tocados]
+
+    if len(set(letras)) == 1:
+        return "vertical"
+    elif len(set(numeros)) == 1:
+        return "horizontal"
+    else:
+        # caso de más de un barco o ataque disperso
+        return None
