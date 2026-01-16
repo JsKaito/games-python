@@ -120,34 +120,38 @@ def hunt(casillasTocadas, opcionesIA):
     
     Args:
         casillasTocadas (tuple list): Lista de tuplas de casillas tocadas
+        
+    Returns:
+        posiblesAtaques (tuple list): Lista de tuplas de posibles ataques
     '''
     
     if not casillasTocadas: # Comprueba si hay elementos en el array
         return []
     
+    posiblesAtaques = []
     if len(casillasTocadas) >= 2: # Línea
+
         xs = {x for x, y in casillasTocadas}
         ys = {y for x, y in casillasTocadas}
         
         if len(ys) == 1: # Si las 'y' son iguales, el barco está en horizontal
-            y = ys[0]
-            coords = [(min(xs)-1, y), (max(xs)+1, y)]
+            y = next(iter(ys))
+            posiblesAtaques = [(min(xs)-1, y), (max(xs)+1, y)]
             
-        if len(xs) == 1: # Si las 'x' son iguales, el barco está en vertical
-            x = xs[0]
-            coords = [(x, min(ys)-1), (x, max(ys)+1)]
+        elif len(xs) == 1: # Si las 'x' son iguales, el barco está en vertical
+            x = next(iter(xs))
+            posiblesAtaques = [(x, min(ys)-1), (x, max(ys)+1)]
 
-        for coord in coords:
-            if coord not in opcionesIA:
-                coords.remove(coord)
+    posiblesAtaques = [ataque for ataque in posiblesAtaques if ataque in opcionesIA]
 
-    if not coords: # Sin dirección
+    if not posiblesAtaques: # Sin dirección
         for tocado in casillasTocadas:
-            coords = (obtenerAdyacentes(tocado, opcionesIA))
-            
-    posiblesAtaques = coords
+            posiblesAtaques.extend(obtenerAdyacentes(tocado, opcionesIA))
+    
+    return posiblesAtaques
+    
+    #TODO ATACAR DESPUÉS
 
-    #TODO Desarrollar el modo caza de la ia. Llamarla en la función de cada ataque si quedan casillas tocadas. 
     #TODO Las casillas tocadas vendrán de la función de ataque por probabilidades.
     
     
