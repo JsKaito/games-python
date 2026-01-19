@@ -16,11 +16,9 @@ import random as rd
 tamaño = 10
 opcionesIA, opcionesUser = set(), set()
 movimiento = ("A", 1)
-barcos = [5, 4, 3, 3.2, 2]
+barcos = [5, 4, 3, 3, 2]
 ultimoMovimiento = 0
 objetivos = []
-
-# TODO Cambiar lógica básica del programa para sustituir el 1/0 por barcos distintos con distintos valores (para facilitar lógica IA final)
 
 # Creación de array de coordenadas completas (Para reducir las opciones de coordenadas cuando se vayan usando)
 def crearOpciones():
@@ -87,10 +85,6 @@ def obtenerAdyacentes(coordenada):
 
     return adyacentes
 
-#TODO Función de ataque según probabilidades
-def pensarAtaque(casillasTocadas):
-    print()
-
 def hunt(casillasTocadas):
     
     '''
@@ -129,28 +123,17 @@ def hunt(casillasTocadas):
     posiblesAtaques = [opcion for opcion in posiblesAtaques if opcion in opcionesIA]
 
     return posiblesAtaques
-    
-    
-    #TODO ATACAR DESPUÉS
 
-    #TODO Las casillas tocadas vendrán de la función de ataque por probabilidades.
+
+#TODO Función de ataque según probabilidades
+    #TODO calcularProbabilidades: Calcula la probabilidad de cada casilla según los barcos que caben
+    #TODO barcoCabe: Crear función que mire si un barco cabe en una zona contando con el agua
+    #TODO aplicarBonusAjedrez: Aplica más probabilidades usando un patrón de tablero de ajedrez (explicar en docstring)
+    #TODO pensarAtaque: Piensa el ataque teniendo en cuenta los valores de las funciones anteriores
     
+def pensarAtaque(casillasTocadas):
+    print()
 
 
 '''FLUJO DEL PROGRAMA'''
 crearOpciones()
-
-
-# TODO: Patrón último movimiento para programación de la IA
-# TODO: Arrays de todos los movimientos y movimientos ya hechos para optimizar el pensamiento de la IA y que no funcione con brute-force.
-# ! Cuando cree los arrays funcionales de las coordenadas completas y use los movimientos para reducirlo, cambiar los nombres de las variables y métodos deprecados.
-
-
-
-
-
-
-# TODO (Lucia): Función para colocar barcos del usuario -- Lucia
-# TODO (Rocío): Función de ataque del usuario / IA
-# TODO (Fer): Función para colocar barcos de la IA
-# TODO (Fer): Función de pensar el ataque de la IA
