@@ -14,7 +14,7 @@ import random as rd
 
 # ! ZONA DEBUG
 tamaño = 10
-opcionesIA, opcionesUser = [], []
+opcionesIA, opcionesUser = set(), set()
 movimiento = ("A", 1)
 barcos = [5, 4, 3, 3.2, 2]
 ultimoMovimiento = 0
@@ -23,14 +23,16 @@ objetivos = []
 # TODO Cambiar lógica básica del programa para sustituir el 1/0 por barcos distintos con distintos valores (para facilitar lógica IA final)
 
 # Creación de array de coordenadas completas (Para reducir las opciones de coordenadas cuando se vayan usando)
-for i in range(1, tamaño + 1):
-    for j in range (1, tamaño + 1):
-        opcionesIA.append((i, j))
-        opcionesUser.append((i, j))
+def crearOpciones():
+    '''Crea las listas de opciones del usuario y de la IA'''
+    for i in range(1, tamaño + 1):
+        for j in range (1, tamaño + 1):
+            opcionesIA.add((i, j))
+            opcionesUser.add((i, j))
 
 # Función de creación del tablero
 def crearTablero(tamaño):
-    '''Creación de los tableros vacíos
+    '''Crea los tableros vacíos del usuario y de la IA
 
     Args:
         tama (int): Tamaño de los tableros
@@ -45,7 +47,7 @@ def crearTablero(tamaño):
 tablero = crearTablero(10)
 
 def actualizarMovimientos(movimiento, jugador): # FALTA DECLARAR MOVIMIENTO
-    '''Función para actualizar movimientos
+    '''Actualiza la lista de movimientos del usuario o de la IA
 
     Args:
         movimiento (tuple): Representa la coordenada (x, y)
@@ -58,12 +60,11 @@ def actualizarMovimientos(movimiento, jugador): # FALTA DECLARAR MOVIMIENTO
         opcionesIA.remove(movimiento) # VIENE DE LA FUNCIÓN DE ATAQUE
 
 
-def obtenerAdyacentes(coordenada, opcionesIA):
-    '''Función que obtiene las coordenadas adyacentes a otra
+def obtenerAdyacentes(coordenada):
+    '''Obtiene las coordenadas adyacentes a otra
 
     Args:
         coordenada (tuple): Representa la coordenada (x, y)
-        opcionesIA (tuple list): Contiene las opciones válidas que puede realizar la IA
 
     Returns:
         adyacentes (array): Lista de coordenadas adyacentes
@@ -87,10 +88,10 @@ def obtenerAdyacentes(coordenada, opcionesIA):
     return adyacentes
 
 #TODO Función de ataque según probabilidades
-def pensarAtaque(casillasTocadas, opcionesIA):
+def pensarAtaque(casillasTocadas):
     print()
 
-def hunt(casillasTocadas, opcionesIA):
+def hunt(casillasTocadas):
     
     '''
     La IA iniciará un modo cacería siempre que queden casillas en estado "tocado"
@@ -121,7 +122,7 @@ def hunt(casillasTocadas, opcionesIA):
 
     if not posiblesAtaques: # Si no encuentra línea, devuelve las adyacentes del tocado
         for tocado in casillasTocadas:
-            posiblesAtaques.extend(obtenerAdyacentes(tocado, opcionesIA))
+            posiblesAtaques.extend(obtenerAdyacentes(tocado))
             
     # Esta línea es List Comprehension. Crea una lista nueva usando una antigua de forma directa, sin necesidad de crear una nueva lista auxiliar
     # Verifica que la 'x' y la 'y' estén entre 1 y 10 (ya que si no, no está en la lista de opcionesIA), y que la opción sea posible para la IA
@@ -134,7 +135,11 @@ def hunt(casillasTocadas, opcionesIA):
 
     #TODO Las casillas tocadas vendrán de la función de ataque por probabilidades.
     
-    
+
+
+'''FLUJO DEL PROGRAMA'''
+crearOpciones()
+
 
 # TODO: Patrón último movimiento para programación de la IA
 # TODO: Arrays de todos los movimientos y movimientos ya hechos para optimizar el pensamiento de la IA y que no funcione con brute-force.
