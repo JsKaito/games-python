@@ -8,5 +8,6 @@ for i in range(filas):
     fila = ["."] * columnas
     tablero.append(fila)
 
-# Si lo imprimes así, se ve feo (con corchetes y comas)
+# Se puede ver el principio
 print(tablero)
+
