@@ -18,7 +18,6 @@ opcionesIA, opcionesUser = [], []
 movimiento = ("A", 1)
 barcos = [5, 4, 3, 3.2, 2]
 ultimoMovimiento = 0
-movimientosHechosIA, movimientosHechosUsuario = [], []
 objetivos = []
 
 # TODO Cambiar lógica básica del programa para sustituir el 1/0 por barcos distintos con distintos valores (para facilitar lógica IA final)
@@ -53,9 +52,9 @@ def actualizarMovimientos(movimiento, jugador): # FALTA DECLARAR MOVIMIENTO
         jugador (string: 'user' / 'ia'): Verifica si ataca el usuario o la IA
     '''
     
-    if esUsuario:
+    if jugador == "user":
         opcionesUser.remove(movimiento)
-    else:
+    elif jugador == "ia":
         opcionesIA.remove(movimiento) # VIENE DE LA FUNCIÓN DE ATAQUE
 
 
@@ -89,7 +88,7 @@ def obtenerAdyacentes(coordenada, opcionesIA):
 
 #TODO Función de ataque según probabilidades
 def pensarAtaque(casillasTocadas, opcionesIA):
-    
+    print()
 
 def hunt(casillasTocadas, opcionesIA):
     
@@ -112,20 +111,20 @@ def hunt(casillasTocadas, opcionesIA):
         xs = {x for x, y in casillasTocadas}
         ys = {y for x, y in casillasTocadas}
         
-        if len(ys) == 1: # Si las 'y' son iguales, el barco está en horizontal
-            y = next(iter(ys))
-            posiblesAtaques = [(min(xs)-1, y), (max(xs)+1, y)]
-            
-        elif len(xs) == 1: # Si las 'x' son iguales, el barco está en vertical
+        if len(xs) == 1 and max(ys) - min(ys) + 1 == len(ys): # Si las 'x' son iguales y las 'y' son continuas, el barco está en vertical
             x = next(iter(xs))
             posiblesAtaques = [(x, min(ys)-1), (x, max(ys)+1)]
+        
+        elif len(ys) == 1 and max(xs) - min(xs) + 1 == len(xs): # Si las 'y' son iguales y las 'x' son continuas, el barco está en horizontal 
+            y = next(iter(ys))
+            posiblesAtaques = [(min(xs)-1, y), (max(xs)+1, y)]
 
     if not posiblesAtaques: # Si no encuentra línea, devuelve las adyacentes del tocado
         for tocado in casillasTocadas:
             posiblesAtaques.extend(obtenerAdyacentes(tocado, opcionesIA))
             
     # Esta línea es List Comprehension. Crea una lista nueva usando una antigua de forma directa, sin necesidad de crear una nueva lista auxiliar
-    # Verifica que la 'x' y la 'y' estén entre 1 y 10 (ya que si no, no está en la lista de opciones posibles), y que la opción sea posible para la IA
+    # Verifica que la 'x' y la 'y' estén entre 1 y 10 (ya que si no, no está en la lista de opcionesIA), y que la opción sea posible para la IA
     posiblesAtaques = [opcion for opcion in posiblesAtaques if opcion in opcionesIA]
 
     return posiblesAtaques
