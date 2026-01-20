@@ -81,3 +81,30 @@ for barco, tamano in barcos:
             colocado = True
         else:
             print("No se puede colocar ahí. Intentalo de nuevo.")
+            
+            
+# aplicarBonusAjedrez: Aplica más proabilidades usando un patrón de tabler de ajedrez (explicar en docstring)
+
+def aplicarPatronTablero(probabilidades, opcionesIA):
+    '''
+    Aplica un patrón de tablero de ajedrez para optimizar ataques iniciales
+    Esto hace que la IA ataque primero casillas que tienen más probabilidad
+    de detectar barcos grandes
+    
+    Args:
+        probabilidades (ndarray): Matriz de probabilidades
+        opcionesIA (set): Coordenadas disponibles
+        
+    Returns:
+        ndarray: Probabilidades ajustadas con el patrón
+    '''
+    
+    tamaño = len(probabilidades)
+    
+    # Bonus para casillas en patrón de tablero (mejor para detectar barcos grandes)
+    for i in range(tamaño):
+        for j in range(tamaño):
+            if (i + j) % 2 == 0:  # Patrón de ajedrez
+                probabilidades[i][j] *= 1.1
+    
+    return probabilidades
