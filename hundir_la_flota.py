@@ -127,9 +127,13 @@ def hunt(casillasTocadas):
 
 #TODO Función de ataque según probabilidades
     #TODO calcularProbabilidades: Calcula la probabilidad de cada casilla según los barcos que caben
+    #! ALFON
     #TODO barcoCabe: Crear función que mire si un barco cabe en una zona contando con el agua
+    #! ALFON
     #TODO aplicarBonusAjedrez: Aplica más probabilidades usando un patrón de tablero de ajedrez (explicar en docstring)
+    #! LUCIA
     #TODO pensarAtaque: Piensa el ataque teniendo en cuenta los valores de las funciones anteriores
+    
     
 def pensarAtaque(casillasTocadas):
     print()
