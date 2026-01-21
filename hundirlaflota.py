@@ -14,7 +14,7 @@ barcos = [
     ("Destructor", 2)
 ]
 
-for barco, tamano in barcos:
+for barco, tamaño in barcos:
 
     colocado = False
     while not colocado:
@@ -31,7 +31,7 @@ for barco, tamano in barcos:
                     print("■", end=" ")
             print()
 
-        print(f"\nColoca tu {barco} (tamaño {tamano})")
+        print(f"\nColoca tu {barco} (tamaño {tamaño})")
         
         # Pedir datos
         
@@ -48,10 +48,10 @@ for barco, tamano in barcos:
         cabe = True
 
         if orientacion == "H":
-            if columna + tamano > 10:
+            if columna + tamaño > 10:
                 cabe = False
         elif orientacion == "V":
-            if fila + tamano > 10:
+            if fila + tamaño > 10:
                 cabe = False
         else:
             print("Orientación incorrecta")
@@ -61,11 +61,11 @@ for barco, tamano in barcos:
         
         if cabe:
             if orientacion == "H":
-                for i in range(tamano):
+                for i in range(tamaño):
                     if tablero[fila][columna + i] == 1:
                         cabe = False
             else:
-                for i in range(tamano):
+                for i in range(tamaño):
                     if tablero[fila + i][columna] == 1:
                         cabe = False
                         
@@ -73,10 +73,10 @@ for barco, tamano in barcos:
         
         if cabe:
             if orientacion == "H":
-                for i in range(tamano):
+                for i in range(tamaño):
                     tablero[fila][columna + i] = 1
             else:
-                for i in range(tamano):
+                for i in range(tamaño):
                     tablero[fila + i][columna] = 1
             colocado = True
         else:
@@ -101,7 +101,7 @@ def aplicarPatronTablero(probabilidades, opcionesIA):
     
     tamaño = len(probabilidades)
     
-    # Bonus para casillas en patrón de tablero (mejor para detectar barcos grandes)
+    # Bonus para casillas en patrón de tablero 
     for i in range(tamaño):
         for j in range(tamaño):
             if (i + j) % 2 == 0:  # Patrón de ajedrez
