@@ -58,12 +58,48 @@ def cabeBarco(tableroIA, fila, col, tamaño, orientacion):
     
     if orientacion == 'H':
         for i in range(tamaño):
-            if tableroIA[fila][col + i] == -1:  # Agua confirmada
+            if tableroIA[fila][col + i] == 0:  # Agua confirmada
                 return False
                 
     else:  # Vertical
         for i in range(tamaño):
-            if tableroIA[fila + i][col] == -1:  # Agua confirmada
+            if tableroIA[fila + i][col] == 0:  # Agua confirmada
                 return False
     
     return True
+
+#calcularProbabilidades: Calcula la probabilidad de cada casilla según los barcos que caben
+def calcularProbabilidades(tableroIA, barcosRestantes, opcionesIA):
+    '''
+    Calcula la probabilidad de que cada casilla contenga una parte de un barco,
+    basándose en las posiciones posibles de los barcos restantes.
+    
+    Args:
+        tableroIA (ndarray): Tablero de la IA
+        barcosRestantes (list): Lista de tamaños de barcos restantes
+        opcionesIA (set): Set de coordenadas disponibles
+        
+    Returns:
+        dict: Diccionario con coordenadas como claves y probabilidades como valores
+    '''
+    
+    probabilidades = {coord: 0 for coord in opcionesIA}
+    
+    for tamaño in barcosRestantes:
+        for fila in range(10):
+            for col in range(10):
+                # Verificar horizontal
+                if col + tamaño <= 10 and puedeColocarBarco(tableroIA, fila, col, tamaño, 'H', opcionesIA):
+                    for i in range(tamaño):
+                        coord = (fila + 1, col + i + 1)
+                        if coord in probabilidades:
+                            probabilidades[coord] += 1
+                
+                # Verificar vertical
+                if fila + tamaño <= 10 and puedeColocarBarco(tableroIA, fila, col, tamaño, 'V', opcionesIA):
+                    for i in range(tamaño):
+                        coord = (fila + i + 1, col + 1)
+                        if coord in probabilidades:
+                            probabilidades[coord] += 1
+    
+    return probabilidades
