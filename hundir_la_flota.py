@@ -125,6 +125,10 @@ def hunt(casillasTocadas):
     return posiblesAtaques
     
 
+#TODO Función de ataque según probabilidades
+    #TODO calcularProbabilidades
+    #! ALFON?
+
 #* Pulled from branch "Games/alfonso"
 
 def cabeBarco(tableroIA, fila, col, tamaño, orientacion):
@@ -182,7 +186,6 @@ def aplicarPatronTablero(probabilidades, opcionesIA):
     return probabilidades
 
 
-#TODO Función de ataque según probabilidades
     #TODO pensarAtaque: Piensa el ataque teniendo en cuenta los valores de las funciones anteriores
     #! FER
 
