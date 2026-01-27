@@ -20,7 +20,7 @@ barcos = [5, 4, 3, 3, 2]
 ultimoMovimiento = 0
 objetivos = []
 
-# Creación de array de coordenadas completas (Para reducir las opciones de coordenadas cuando se vayan usando)
+
 def crearOpciones():
     '''Crea las listas de opciones del usuario y de la IA'''
     for i in range(1, tamaño + 1):
@@ -28,7 +28,7 @@ def crearOpciones():
             opcionesIA.add((i, j))
             opcionesUser.add((i, j))
 
-# Función de creación del tablero
+
 def crearTablero(tamaño):
     '''Crea los tableros vacíos del usuario y de la IA
 
@@ -41,8 +41,7 @@ def crearTablero(tamaño):
 
     tablero = np.zeros((tamaño, tamaño), dtype=int)
     return tablero
-    
-tablero = crearTablero(10)
+
 
 def actualizarMovimientos(movimiento, jugador): # FALTA DECLARAR MOVIMIENTO
     '''Actualiza la lista de movimientos del usuario o de la IA
@@ -85,6 +84,7 @@ def obtenerAdyacentes(coordenada):
 
     return adyacentes
 
+
 def hunt(casillasTocadas):
     
     '''
@@ -123,21 +123,73 @@ def hunt(casillasTocadas):
     posiblesAtaques = [opcion for opcion in posiblesAtaques if opcion in opcionesIA]
 
     return posiblesAtaques
+    
+
+#* Pulled from branch "Games/alfonso"
+
+def cabeBarco(tableroIA, fila, col, tamaño, orientacion):
+    '''
+    Verifica si un barco puede caber en una zona específica del tablero,
+    considerando las casillas de agua (-1).
+    
+    Args:
+        tableroIA (ndarray): Tablero de la IA
+        fila (int): Fila inicial
+        col (int): Columna inicial
+        tamaño (int): Tamaño del barco
+        orientacion (str): 'H' para horizontal, 'V' para vertical
+        
+    Returns:
+        bool: True si el barco puede caber, False en caso contrario
+    '''
+    
+    if orientacion == 'H':
+        for i in range(tamaño):
+            if tableroIA[fila][col + i] == -1 or (fila + 1, col + 1 + i) not in opcionesIA:  # Agua confirmada
+                return False
+                
+    else:  # Vertical
+        for i in range(tamaño):
+            if tableroIA[fila + i][col] == -1 or (fila + 1 + i, col + 1) not in opcionesIA:  # Agua confirmada
+                return False
+    
+    return True
+
+
+#* Pulled from branch "Games/lucia"
+
+def aplicarPatronTablero(probabilidades, opcionesIA):
+    '''
+    Aplica un patrón de tablero de ajedrez para optimizar ataques.
+    El patrón favorece a la IA ya que los barcos miden 2 o más casillas
+    
+    Args:
+        probabilidades (ndarray): Matriz de probabilidades
+        opcionesIA (set): Coordenadas disponibles
+        
+    Returns:
+        probabilidades(ndarray): Matriz de probabilidades actualizadas con el patrón
+    '''
+    
+    tamaño = len(probabilidades)
+    
+    # Bonus para casillas en patrón de tablero 
+    for i in range(tamaño):
+        for j in range(tamaño):
+            if (i + j) % 2 == 0:  # Patrón de ajedrez
+                probabilidades[i][j] *= 1.1
+    
+    return probabilidades
 
 
 #TODO Función de ataque según probabilidades
-    #TODO calcularProbabilidades: Calcula la probabilidad de cada casilla según los barcos que caben
-    #! ALFON
-    #TODO barcoCabe: Crear función que mire si un barco cabe en una zona contando con el agua
-    #! ALFON
-    #TODO aplicarBonusAjedrez: Aplica más probabilidades usando un patrón de tablero de ajedrez (explicar en docstring)
-    #! LUCIA
     #TODO pensarAtaque: Piensa el ataque teniendo en cuenta los valores de las funciones anteriores
-    
-    
+    #! FER
+
 def pensarAtaque(casillasTocadas):
     print()
 
 
 '''FLUJO DEL PROGRAMA'''
+tablero = crearTablero(10)
 crearOpciones()
