@@ -7,6 +7,13 @@ tablero = np.zeros((10, 10), dtype=int)
 
 # Lista de barcos (nombre, tamaño)
 def crearBarcos():
+    '''
+    Crea los barcos 
+    
+    Returns:
+        barcos (tuple list): Lista con barcos y tamaño
+    '''
+    
     barcos = [
         ("Portaaviones", 5),
         ("Acorazado", 4),
@@ -16,105 +23,119 @@ def crearBarcos():
     ]
     return barcos
 
-# def colocarBarcos(barcos):
-#     for barco, tamaño in barcos:
+def colocarBarcos(barcos):
+    '''
+    Coloca los barcos del jugador en el tablero 
+    
+    Args:
+        barcos (tuple list): Lista con barcos y tamaño
+    '''
+    
+    for barco, tamaño in barcos:
 
-#         colocado = False
-#         while not colocado:
+        colocado = False
+        while not colocado:
 
-#             # Mostrar tablero
+            # Mostrar tablero
             
-#             print("\n  1 2 3 4 5 6 7 8 9 10")
-#             for fila in range(10):
-#                 print(fila + 1, end="  ")
-#                 for col in range(10):
-#                     if tablero[fila][col] == 0:
-#                         print("~", end=" ")
-#                     else:
-#                         print("■", end=" ")
-#                 print()
+            print("\n  1 2 3 4 5 6 7 8 9 10")
+            for fila in range(10):
+                print(fila + 1, end="  ")
+                for col in range(10):
+                    if tablero[fila][col] == 0:
+                        print("~", end=" ")
+                    else:
+                        print("■", end=" ")
+                print()
 
-#             print(f"\nColoca tu {barco} (tamaño {tamaño})")
+            print(f"\nColoca tu {barco} (tamaño {tamaño})")
             
-#             # Pedir datos
+            # Pedir datos
             
-#             fila = int(input("Fila (1-10): ")) - 1
-#             columna = int(input("Columna (1-10): ")) - 1
-#             orientacion = input("Orientación (H/V): ").upper()
+            fila = int(input("Fila (1-10): ")) - 1
+            columna = int(input("Columna (1-10): ")) - 1
+            orientacion = input("Orientación (H/V): ").upper()
 
-#             if fila < 0 or fila > 9 or columna < 0 or columna > 9:
-#                 print("Fila o columna fuera del tablero")
-#                 continue
+            if fila < 0 or fila > 9 or columna < 0 or columna > 9:
+                print("Fila o columna fuera del tablero")
+                continue
             
-#             # Comprobar si cabe
+            # Comprobar si cabe
             
-#             cabe = True
+            cabe = True
 
-#             if orientacion == "H":
-#                 if columna + tamaño > 10:
-#                     cabe = False
-#             elif orientacion == "V":
-#                 if fila + tamaño > 10:
-#                     cabe = False
-#             else:
-#                 print("Orientación incorrecta")
-#                 continue
+            if orientacion == "H":
+                if columna + tamaño > 10:
+                    cabe = False
+            elif orientacion == "V":
+                if fila + tamaño > 10:
+                    cabe = False
+            else:
+                print("Orientación incorrecta")
+                continue
                     
-#             # Comprobar si pisa otro barco
+            # Comprobar si pisa otro barco
             
-#             if cabe:
-#                 if orientacion == "H":
-#                     for i in range(tamaño):
-#                         if tablero[fila][columna + i] == 1:
-#                             cabe = False
-#                 else:
-#                     for i in range(tamaño):
-#                         if tablero[fila + i][columna] == 1:
-#                             cabe = False
+            if cabe:
+                if orientacion == "H":
+                    for i in range(tamaño):
+                        if tablero[fila][columna + i] == 1:
+                            cabe = False
+                else:
+                    for i in range(tamaño):
+                        if tablero[fila + i][columna] == 1:
+                            cabe = False
                             
-#             # Colocar barco
+            # Colocar barco
             
-#             if cabe:
-#                 if orientacion == "H":
-#                     for i in range(tamaño):
-#                         tablero[fila][columna + i] = 1
-#                 else:
-#                     for i in range(tamaño):
-#                         tablero[fila + i][columna] = 1
-#                 colocado = True
-#             else:
-#                 print("No se puede colocar ahí. Intentalo de nuevo.")
+            if cabe:
+                if orientacion == "H":
+                    for i in range(tamaño):
+                        tablero[fila][columna + i] = 1
+                else:
+                    for i in range(tamaño):
+                        tablero[fila + i][columna] = 1
+                colocado = True
+            else:
+                print("No se puede colocar ahí. Intentalo de nuevo.")
             
             
-# # aplicarBonusAjedrez: Aplica más proabilidades usando un patrón de tabler de ajedrez (explicar en docstring)
+# aplicarBonusAjedrez: Aplica más proabilidades usando un patrón de tabler de ajedrez 
 
-# def aplicarPatronTablero(probabilidades, opcionesIA):
-#     '''
-#     Aplica un patrón de tablero de ajedrez para optimizar ataques iniciales
-#     Esto hace que la IA ataque primero casillas que tienen más probabilidad
-#     de detectar barcos grandes
+def aplicarPatronTablero(probabilidades, opcionesIA):
+    '''
+    Aplica un patrón de tablero de ajedrez para optimizar ataques iniciales
+    Esto hace que la IA ataque primero casillas que tienen más probabilidad
+    de detectar barcos grandes
     
-#     Args:
-#         probabilidades (ndarray): Matriz de probabilidades
-#         opcionesIA (set): Coordenadas disponibles
+    Args:
+        probabilidades (ndarray): Matriz de probabilidades
+        opcionesIA (set): Coordenadas disponibles
         
-#     Returns:
-#         ndarray: Probabilidades ajustadas con el patrón
-#     '''
+    Returns:
+        ndarray: Probabilidades ajustadas con el patrón
+    '''
     
-#     tamaño = len(probabilidades)
+    tamaño = len(probabilidades)
     
-#     # Bonus para casillas en patrón de tablero 
-#     for i in range(tamaño):
-#         for j in range(tamaño):
-#             if (i + j) % 2 == 0:  # Patrón de ajedrez
-#                 probabilidades[i][j] *= 1.1
+    # Bonus para casillas en patrón de tablero 
+    for i in range(tamaño):
+        for j in range(tamaño):
+            if (i + j) % 2 == 0:  # Patrón de ajedrez
+                probabilidades[i][j] *= 1.1
     
-#     return probabilidades
+    return probabilidades
 
 tablero_ia = np.zeros((10, 10), dtype=int)
 
 def colocarBarcosIA(barcos, tablero_ia):
+    '''
+    Coloca los barcos de la IA en el tablero automáticamente
+    
+    Args:
+        barcos (tuple list): Lista con barcos y tamaño
+        tablero_ia (tuple ndarray): Tablero de la IA
+    '''
 
     for barco, tamaño in barcos:
 
