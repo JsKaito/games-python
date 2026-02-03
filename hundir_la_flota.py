@@ -19,6 +19,73 @@ movimiento = ("A", 1)
 barcos = [5, 4, 3, 3, 2]
 ultimoMovimiento = 0
 objetivos = []
+casillasTocadas = set()
+
+#* Pulled from branch "Games/lucia"
+
+def crearBarcos():
+    '''
+    Crea los barcos 
+    
+    Returns:
+        barcos (tuple list): Lista con barcos y tamaño
+    '''
+    
+    barcos = [
+        ("Portaaviones", 5),
+        ("Acorazado", 4),
+        ("Crucero 1", 3),
+        ("Crucero 2", 3),
+        ("Destructor", 2)
+    ]
+    return barcos
+
+barcosIA = crearBarcos()
+barcosUser = crearBarcos()
+
+
+def preguntar(coordenada):
+    print("1. Agua")
+    print("2. Tocado")
+    print("3. Hundido")
+    while True:
+        try:
+            opcion = int(input(f"La coordenada {coordenada}, ¿Qué era?: "))
+            if opcion not in [1, 2, 3]:
+                print("Introduce un número correcto.")
+            else:
+                return opcion
+        except ValueError:
+            print("Introduce un número válido.")
+            
+def asignarCasilla(tableroUser, coordenada):
+    opcion = preguntar(coordenada)
+    opcionesIA.remove(coordenada)
+    
+    if opcion == 2:
+        casillasTocadas.append(coordenada)
+        
+    if opcion == 3:
+        # TODO enlazar funcion actualizarBarcos
+        
+        
+        
+    
+    
+
+def actualizarBarcos(jugador, barcos, hundido):
+    
+    if jugador == "user":
+        for barco in barcosUser:
+            if barco[1] == hundido:
+                barcosUser.remove(barco)
+                break
+            
+    elif jugador == "ia":
+        for barco in barcosIA:
+            if barco[1] == hundido:
+                barcos.remove(barco)
+                break
 
 
 def crearOpciones():
@@ -126,8 +193,7 @@ def hunt(casillasTocadas):
     
 
 #TODO Función de ataque según probabilidades
-    #TODO calcularProbabilidades
-    #! ALFON?
+def calcularProbabilidades(tablero_usuario, barcosRestantesIA):
 
 #* Pulled from branch "Games/alfonso"
 
@@ -189,8 +255,8 @@ def aplicarPatronTablero(probabilidades, opcionesIA):
     #TODO pensarAtaque: Piensa el ataque teniendo en cuenta los valores de las funciones anteriores
     #! FER
 
-def pensarAtaque(casillasTocadas):
-    print()
+# def pensarAtaque(tableroIA, casillasTocadas):
+    
 
 
 '''FLUJO DEL PROGRAMA'''
