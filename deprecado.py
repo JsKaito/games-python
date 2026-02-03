@@ -99,3 +99,30 @@ def obtenerOrientacion(tocados):
     else:
         # caso de más de un barco o ataque disperso
         return None
+    
+    
+def preguntar(coordenada):
+    
+    print("1. Agua")
+    print("2. Tocado")
+    print("3. Hundido")
+    
+    while True:
+        try:
+            opcion = int(input(f"La coordenada {coordenada}, ¿Qué era?: "))
+            if opcion not in [1, 2, 3]:
+                print("Introduce un número correcto.")
+            else:
+                return opcion
+        except ValueError:
+            print("Introduce un número válido.")
+            
+def asignarCasilla(tableroUser, coordenada):
+    opcion = preguntar(coordenada)
+    opcionesIA.remove(coordenada)
+    
+    if opcion == 2:
+        casillasTocadas.add(coordenada)
+    
+    if opcion == 3:
+        hundir_barco_si_tocado("user", coordenada)

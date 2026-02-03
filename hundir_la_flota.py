@@ -21,22 +21,22 @@ ultimoMovimiento = 0
 objetivos = []
 casillasTocadas = set()
 
-#* Pulled from branch "Games/lucia"
+#* Pulled from branch "Games/lucia", modified
 
 def crearBarcos():
     '''
     Crea los barcos 
     
     Returns:
-        barcos (tuple list): Lista con barcos y tamaño
+        barcos (dictionary list): Lista de diccionarios con barcos, tamaños y coordenadas
     '''
-    
+
     barcos = [
-        ("Portaaviones", 5),
-        ("Acorazado", 4),
-        ("Crucero 1", 3),
-        ("Crucero 2", 3),
-        ("Destructor", 2)
+        {"nombre": "Portaaviones", "tamaño": 5, "coordenadas": []},
+        {"nombre": "Acorazado", "tamaño": 4, "coordenadas": []},
+        {"nombre": "Crucero 1", "tamaño": 3, "coordenadas": []},
+        {"nombre": "Crucero 2", "tamaño": 3, "coordenadas": []},
+        {"nombre": "Destructor", "tamaño": 2, "coordenadas": []}
     ]
     return barcos
 
@@ -44,36 +44,100 @@ barcosIA = crearBarcos()
 barcosUser = crearBarcos()
 
 
-def preguntar(coordenada):
-    print("1. Agua")
-    print("2. Tocado")
-    print("3. Hundido")
-    while True:
-        try:
-            opcion = int(input(f"La coordenada {coordenada}, ¿Qué era?: "))
-            if opcion not in [1, 2, 3]:
-                print("Introduce un número correcto.")
-            else:
-                return opcion
-        except ValueError:
-            print("Introduce un número válido.")
-            
-def asignarCasilla(tableroUser, coordenada):
-    opcion = preguntar(coordenada)
-    opcionesIA.remove(coordenada)
-    
-    if opcion == 2:
-        casillasTocadas.append(coordenada)
-        
-    if opcion == 3:
-        # TODO enlazar funcion actualizarBarcos
-        
-        
-        
-    
-    
+#* Pulled from branch "Games/lucia", modified
 
-def actualizarBarcos(jugador, barcos, hundido):
+def colocarBarcos(barcos):
+    '''
+    Coloca los barcos del jugador en el tablero 
+    
+    Args:
+        barcos (tuple list): Lista con barcos y tamaño
+    '''
+    
+    for barco, tamaño in barcos:
+
+        colocado = False
+        while not colocado:
+
+            # Mostrar tablero
+            
+            print("\n  1 2 3 4 5 6 7 8 9 10")
+            for fila in range(10):
+                print(fila + 1, end="  ")
+                for col in range(10):
+                    if tablero[fila][col] == 0:
+                        print("~", end=" ")
+                    else:
+                        print("■", end=" ")
+                print()
+
+            print(f"\nColoca tu {barco} (tamaño {tamaño})")
+            
+            # Pedir datos
+            
+            fila = int(input("Fila (1-10): ")) - 1
+            columna = int(input("Columna (1-10): ")) - 1
+            orientacion = input("Orientación (H/V): ").upper()
+
+            if fila < 0 or fila > 9 or columna < 0 or columna > 9:
+                print("Fila o columna fuera del tablero")
+                continue
+            
+            # Comprobar si cabe
+            
+            cabe = True
+
+            if orientacion == "H":
+                if columna + tamaño > 10:
+                    cabe = False
+            elif orientacion == "V":
+                if fila + tamaño > 10:
+                    cabe = False
+            else:
+                print("Orientación incorrecta")
+                continue
+                    
+            # Comprobar si pisa otro barco
+            
+            if cabe:
+                if orientacion == "H":
+                    for i in range(tamaño):
+                        if tablero[fila][columna + i] == 1:
+                            cabe = False
+                else:
+                    for i in range(tamaño):
+                        if tablero[fila + i][columna] == 1:
+                            cabe = False
+                            
+            # Colocar barco
+            
+            if cabe:
+                
+                if orientacion == "H":
+                    for i in range(tamaño):
+                        tablero[fila][columna + i] = 1
+                        barcos[i]["coordenadas"].append((fila, columna + i))
+                        
+                elif orientacion == "V":
+                    for i in range(tamaño):
+                        tablero[fila + i][columna] = 1
+                        barcos[i]["coordenadas"].append((fila + i, columna))
+                        
+                colocado = True
+            else:
+                print("No se puede colocar ahí. Intentalo de nuevo.")
+
+
+def revisarBarcos(barcos, coordenada):
+    """
+    Cambia el estado de todas las casillas de un barco a hundido si todas han sido tocadas.
+    """
+    # TODO Revisar tocados para ver si son hundidos al final de cada turno de la IA
+    for barco in barcos:
+        
+        
+
+def actualizarBarcos(jugador, hundido):
     
     if jugador == "user":
         for barco in barcosUser:
@@ -194,7 +258,8 @@ def hunt(casillasTocadas):
 
 #TODO Función de ataque según probabilidades
 def calcularProbabilidades(tablero_usuario, barcosRestantesIA):
-
+    print()
+    # TODO
 #* Pulled from branch "Games/alfonso"
 
 def cabeBarco(tableroIA, fila, col, tamaño, orientacion):
