@@ -1,4 +1,4 @@
-# creae una funcion que elimine una coordenada de una lista de coordenadas posibles de una lista de coordenadas posibles#
+# ColocarBarco: creae una funcion que elimine una coordenada de una lista de coordenadas posibles de una lista de coordenadas posibles
 
 def puedeColocarBarco(tableroIA, fila, col, tamaño, orientacion, opcionesIA):
     '''
@@ -39,24 +39,10 @@ def puedeColocarBarco(tableroIA, fila, col, tamaño, orientacion, opcionesIA):
 
     return True
 
-# TODO barcoCabe: Crear función que mire si un barco cabe en una zona contando con el agua
+# BarcoCabe: Crear una función que mire si un barco cabe en una zona contando con el agua
 
 
 def cabeBarco(tableroIA, fila, col, tamaño, orientacion):
-    '''
-    Verifica si un barco puede caber en una zona específica del tablero,
-    considerando las casillas de agua (-1).
-
-    Args:
-        tableroIA (ndarray): Tablero de la IA
-        fila (int): Fila inicial
-        col (int): Columna inicial
-        tamaño (int): Tamaño del barco
-        orientacion (str): 'H' para horizontal, 'V' para vertical
-
-    Returns:
-        bool: True si el barco puede caber, False en caso contrario
-    '''
 
     if orientacion == 'H':
         for i in range(tamaño):
@@ -74,18 +60,6 @@ def cabeBarco(tableroIA, fila, col, tamaño, orientacion):
 
 
 def calcularProbabilidades(tableroIA, barcosRestantes, opcionesIA):
-    '''
-    Calcula la probabilidad de que cada casilla contenga una parte de un barco,
-    basándose en las posiciones posibles de los barcos restantes.
-
-    Args:
-        tableroIA (ndarray): Tablero de la IA
-        barcosRestantes (list): Lista de tamaños de barcos restantes
-        opcionesIA (set): Set de coordenadas disponibles
-
-    Returns:
-        dict: Diccionario con coordenadas como claves y probabilidades como valores
-    '''
 
     probabilidades = {coord: 0 for coord in opcionesIA}
 
@@ -107,29 +81,3 @@ def calcularProbabilidades(tableroIA, barcosRestantes, opcionesIA):
                             probabilidades[coord] += 1
 
     return probabilidades
-
-
-def calcularProbabilidades(tablero, barcosRestantes, opcionesDisponibles):
-    puntos = {}
-    for fila, columna in opcionesDisponibles:
-        puntos[(fila, columna)] = 0
-
-    for tamano in barcosRestantes:
-        for fila in range(1, 11):
-            for columna in range(1, 11):
-
-                if columna + tamano <= 11:
-                    if puedeColocarBarco(tablero, fila, columna, tamano, 'H'):
-                        for i in range(tamano):
-                            coord = (fila, columna + i)
-                            if coord in puntos:
-                                puntos[coord] += 1
-
-                if fila + tamano <= 11:
-                    if puedeColocarBarco(tablero, fila, columna, tamano, 'V'):
-                        for i in range(tamano):
-                            coord = (fila + i, columna)
-                            if coord in puntos:
-                                puntos[coord] += 1
-
-    return puntos
