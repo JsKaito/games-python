@@ -1,47 +1,50 @@
+from juego import Juego
 
-import string
+# INTERFAZ - Control del juego (Rocío)
 
 class Interfaz:
-    def __init__(self):
-        # Inicializar interfaz
-        self.juego = None
+    def jugar(self):
+        # Bucle principal del juego
+        self.juego = Juego(9, 10)
+        print(f"\nBuscaminas (9x9) - 10 minas\n")
+        while not self.juego.fin:
+            self.imprimir_tablero(self.juego.tablero_mostrado())
+            print(f"Reveladas: {self.juego.reveladas}/{self.juego.totales}")
+            print("Revelar: 1A | Marcar: M1A | Rendirse: R")
+            entrada = input("\nJugada: ").strip().upper()
+            if entrada == "R":
+                print("\nTe rendiste!")
+                self.mostrar_fin(False)
+                return
+            if entrada.startswith("M"):
+                f, c = self.juego.parsear(entrada[1:])
+                if f is not None:
+                    self.juego.marcar(f, c)
+                continue
+            f, c = self.juego.parsear(entrada)
+            if f is None:
+                print("Formato invalido")
+                continue
+            if not self.juego.revelar(f, c):
+                print("\nGAME OVER!")
+                self.imprimir_tablero(self.juego.tablero_mostrado())
+                self.mostrar_fin(False)
+                return
+            if self.juego.verificar_victoria():
+                print("\nGANASTE!")
+                self.imprimir_tablero(self.juego.tablero_mostrado())
+                self.mostrar_fin(True)
+                return
 
-    def imprimir_tablero(self, tablero):
-        # Imprimir tablero en pantalla
-        tamaño = tablero.shape[0]
-        letras = string.ascii_uppercase[:tamaño]
-        print("\n      " + "  ".join(letras))
-        for i, fila in enumerate(tablero):
-            print(f" {i+1:2d} | " + "  ".join(str(x) for x in fila))
-        print()
+    def mostrar_fin(self, gano):
+        # Mostrar resultado final
+        if not gano:
+            print("\nSolucion:")
+            self.imprimir_tablero(self.juego.tablero.solucion)
+        if input("\nOtra partida? (S/N): ").strip().upper() == "S":
+            self.jugar()
 
-    def menu_principal(self):
-        # Menú principal
-        while True:
-            print("\n" + "="*35)
-            print("     BUSCAMINAS")
-            print("="*35)
-            print("1. Jugar")
-            print("2. Salir")
-            print("="*35)
-            opcion = input("Opcion: ").strip()
-            if opcion == "1":
-                self.jugar()
-            elif opcion == "2":
-                print("\nAdios\n")
-                break
-            else:
-                print("Opcion invalida")
 
-# Definimos el tamaño 
-filas = 9
-columnas = 9
-
-# Creamos el tablero lleno de puntos '
-tablero = []
-for i in range(filas):
-    fila = ["."] * columnas
-    tablero.append(fila)
-
-print(tablero)
+if __name__ == "__main__":
+    Interfaz().menu_principal()
 
