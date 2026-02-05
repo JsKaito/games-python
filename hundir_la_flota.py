@@ -16,7 +16,6 @@ import random as rd
 tamaño = 10
 opcionesIA, opcionesUser = set(), set()
 movimiento = ("A", 1)
-barcos = [5, 4, 3.1, 3.2, 2]
 ultimoMovimiento = 0
 objetivos = []
 casillasTocadas = set()
@@ -32,11 +31,11 @@ def crearBarcos():
     '''
 
     barcos = [
-        {"nombre": "Portaaviones", "tamaño": 5, "coordenadas": []},
-        {"nombre": "Acorazado", "tamaño": 4, "coordenadas": []},
-        {"nombre": "Crucero 1", "tamaño": 3, "coordenadas": []},
-        {"nombre": "Crucero 2", "tamaño": 3, "coordenadas": []},
-        {"nombre": "Destructor", "tamaño": 2, "coordenadas": []}
+        {"nombre": "Portaaviones", "tamaño": 5, "coordenadas": [], "hundido": False},
+        {"nombre": "Acorazado", "tamaño": 4, "coordenadas": [], "hundido": False},
+        {"nombre": "Crucero 1", "tamaño": 3, "coordenadas": [], "hundido": False},
+        {"nombre": "Crucero 2", "tamaño": 3, "coordenadas": [], "hundido": False},
+        {"nombre": "Destructor", "tamaño": 2, "coordenadas": [], "hundido": False}
     ]
     return barcos
 
@@ -128,32 +127,24 @@ def colocarBarcos(barcos):
                 print("No se puede colocar ahí. Intentalo de nuevo.")
 
 
-def revisarBarcos(barcos, coordenada):
-    """
-    Cambia el estado de todas las casillas de un barco a hundido si todas han sido tocadas.
-    """
+def revisarBarcos(barcos, casillasTocadas):
+    '''
+    Revisa si los barcos han sido hundidos al final de cada turno.
+    
+    Args:
+        barcos (list): Lista de diccionarios de barcos.
+        casillasTocadas (set): Conjunto de coordenadas tocadas.
+    '''
     # TODO Revisar tocados para ver si son hundidos al final de cada turno de la IA
     for barco in barcos:
-        
-        
-
-def actualizarBarcos(jugador, hundido):
-    
-    if jugador == "user":
-        for barco in barcosUser:
-            if barco[1] == hundido:
-                barcosUser.remove(barco)
-                break
-            
-    elif jugador == "ia":
-        for barco in barcosIA:
-            if barco[1] == hundido:
-                barcos.remove(barco)
-                break
+        if all(coordenada in casillasTocadas for coordenada in barco["coordenadas"]) and barco["hundido"] == False:
+            barco["hundido"] = True
 
 
 def crearOpciones():
-    '''Crea las listas de opciones del usuario y de la IA'''
+    '''
+    Crea las listas de opciones del usuario y de la IA.
+    '''
     for i in range(1, tamaño + 1):
         for j in range (1, tamaño + 1):
             opcionesIA.add((i, j))
@@ -164,7 +155,7 @@ def crearTablero(tamaño):
     '''Crea los tableros vacíos del usuario y de la IA
 
     Args:
-        tama (int): Tamaño de los tableros
+        tamaño (int): Tamaño de los tableros
 
     Returns:
         tablero (ndarray): Array bidimensional de numpy lleno de 0.
@@ -258,6 +249,13 @@ def hunt(casillasTocadas):
 
 #TODO Función de ataque según probabilidades
 def calcularProbabilidades(tablero_usuario, barcosRestantesIA):
+    '''
+    Calcula las probabilidades de ataque de la IA en función del tablero del usuario y los barcos restantes.
+    
+    Args:
+        tablero_usuario (ndarray): Tablero del usuario.
+        barcosRestantesIA (list): Lista de barcos restantes de la IA.
+    '''
     print()
     # TODO
 #* Pulled from branch "Games/alfonso"
