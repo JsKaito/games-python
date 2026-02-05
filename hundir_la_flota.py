@@ -12,6 +12,7 @@
 import numpy as np
 import random as rd
 
+
 # ! ZONA DEBUG
 tamaño = 10
 opcionesIA, opcionesUser = set(), set()
@@ -19,6 +20,8 @@ movimiento = ("A", 1)
 ultimoMovimiento = 0
 objetivos = []
 casillasTocadas = set()
+
+
 
 #* Pulled from branch "Games/lucia", modified
 
@@ -53,13 +56,14 @@ def colocarBarcos(barcos):
         barcos (tuple list): Lista con barcos y tamaño
     '''
     
-    for barco, tamaño in barcos:
-
+    for barco in barcos:
+        
+        nombre = barco["nombre"]
+        tamaño = barco["tamaño"]
         colocado = False
+        
         while not colocado:
-
             # Mostrar tablero
-            
             print("\n  1 2 3 4 5 6 7 8 9 10")
             for fila in range(10):
                 print(fila + 1, end="  ")
@@ -70,10 +74,8 @@ def colocarBarcos(barcos):
                         print("■", end=" ")
                 print()
 
-            print(f"\nColoca tu {barco} (tamaño {tamaño})")
-            
+            print(f"\nColoca tu {nombre} (tamaño {tamaño})")
             # Pedir datos
-            
             fila = int(input("Fila (1-10): ")) - 1
             columna = int(input("Columna (1-10): ")) - 1
             orientacion = input("Orientación (H/V): ").upper()
@@ -81,23 +83,22 @@ def colocarBarcos(barcos):
             if fila < 0 or fila > 9 or columna < 0 or columna > 9:
                 print("Fila o columna fuera del tablero")
                 continue
-            
             # Comprobar si cabe
-            
             cabe = True
-
+            
             if orientacion == "H":
                 if columna + tamaño > 10:
                     cabe = False
+                    
             elif orientacion == "V":
                 if fila + tamaño > 10:
                     cabe = False
+                    
             else:
                 print("Orientación incorrecta")
                 continue
-                    
-            # Comprobar si pisa otro barco
             
+            # Comprobar si pisa otro barco
             if cabe:
                 if orientacion == "H":
                     for i in range(tamaño):
@@ -109,19 +110,15 @@ def colocarBarcos(barcos):
                             cabe = False
                             
             # Colocar barco
-            
             if cabe:
-                
                 if orientacion == "H":
                     for i in range(tamaño):
                         tablero[fila][columna + i] = 1
-                        barcos[i]["coordenadas"].append((fila, columna + i))
-                        
+                        barco["coordenadas"].append((fila, columna + i))
                 elif orientacion == "V":
                     for i in range(tamaño):
                         tablero[fila + i][columna] = 1
-                        barcos[i]["coordenadas"].append((fila + i, columna))
-                        
+                        barco["coordenadas"].append((fila + i, columna))
                 colocado = True
             else:
                 print("No se puede colocar ahí. Intentalo de nuevo.")
@@ -135,7 +132,7 @@ def revisarBarcos(barcos, casillasTocadas):
         barcos (list): Lista de diccionarios de barcos.
         casillasTocadas (set): Conjunto de coordenadas tocadas.
     '''
-    # TODO Revisar tocados para ver si son hundidos al final de cada turno de la IA
+
     for barco in barcos:
         if all(coordenada in casillasTocadas for coordenada in barco["coordenadas"]) and barco["hundido"] == False:
             barco["hundido"] = True
@@ -145,13 +142,14 @@ def crearOpciones():
     '''
     Crea las listas de opciones del usuario y de la IA.
     '''
+    
     for i in range(1, tamaño + 1):
         for j in range (1, tamaño + 1):
             opcionesIA.add((i, j))
             opcionesUser.add((i, j))
 
 
-def crearTablero(tamaño):
+def crearTablero(tamaño=10):
     '''Crea los tableros vacíos del usuario y de la IA
 
     Args:
@@ -248,7 +246,7 @@ def hunt(casillasTocadas):
     
 
 #TODO Función de ataque según probabilidades
-def calcularProbabilidades(tablero_usuario, barcosRestantesIA):
+def calcularProbabilidades(barcos):
     '''
     Calcula las probabilidades de ataque de la IA en función del tablero del usuario y los barcos restantes.
     
@@ -256,11 +254,23 @@ def calcularProbabilidades(tablero_usuario, barcosRestantesIA):
         tablero_usuario (ndarray): Tablero del usuario.
         barcosRestantesIA (list): Lista de barcos restantes de la IA.
     '''
-    print()
-    # TODO
+    
+    probabilidades = np.zeros((tamaño, tamaño))
+    
+    for barco in barcos: #que no este hundido
+        for i in range(1, tamaño + 1):
+            for j in range(1, tamaño + 1):
+                if barcoCabe(i, j, barco["tamaño"], 'H'):
+                    probabilidades[i][j] += 1
+                if barcoCabe(i, j, barco["tamaño"], 'V'):
+                    probabilidades[i][j] += 1
+
+    return probabilidades
+
+    
 #* Pulled from branch "Games/alfonso"
 
-def cabeBarco(tableroIA, fila, col, tamaño, orientacion):
+def barcoCabe(fila, col, tamaño, orientacion):
     '''
     Verifica si un barco puede caber en una zona específica del tablero,
     considerando las casillas de agua (-1).
@@ -281,7 +291,7 @@ def cabeBarco(tableroIA, fila, col, tamaño, orientacion):
             if tableroIA[fila][col + i] == -1 or (fila + 1, col + 1 + i) not in opcionesIA:  # Agua confirmada
                 return False
                 
-    else:  # Vertical
+    elif orientacion == 'V':
         for i in range(tamaño):
             if tableroIA[fila + i][col] == -1 or (fila + 1 + i, col + 1) not in opcionesIA:  # Agua confirmada
                 return False
@@ -319,9 +329,14 @@ def aplicarPatronTablero(probabilidades, opcionesIA):
     #! FER
 
 # def pensarAtaque(tableroIA, casillasTocadas):
-    
+
+
 
 
 '''FLUJO DEL PROGRAMA'''
-tablero = crearTablero(10)
+tableroIA = crearTablero()
+tableroUser = crearTablero()
 crearOpciones()
+
+barcos = crearBarcos()
+calcularProbabilidades(barcos)
