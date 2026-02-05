@@ -16,7 +16,7 @@ import random as rd
 tamaño = 10
 opcionesIA, opcionesUser = set(), set()
 movimiento = ("A", 1)
-barcos = [5, 4, 3, 3, 2]
+barcos = [5, 4, 3.1, 3.2, 2]
 ultimoMovimiento = 0
 objetivos = []
 casillasTocadas = set()
