@@ -356,4 +356,6 @@ opcionesUser = crearOpciones()
 
 barcos = crearBarcos()
 
-calcularProbabilidades(barcos)
+# TODO el mapa de calor no funciona bien
+probabilidades = calcularProbabilidades(barcos)
+print(probabilidades.astype(int))
