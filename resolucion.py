@@ -39,22 +39,46 @@ def puedeColocarBarco(tableroIA, fila, col, tamaño, orientacion, opcionesIA):
 
     return True
 
-# BarcoCabe: Crear una función que mire si un barco cabe en una zona contando con el agua
+# BarcoCabe: Crear una función que mire si un barco cabe en una zona contando con el agua, tomando como referencia el punto central del tablero, y el barco debe caber en las cuatro direciones
 
 
-def cabeBarco(tableroIA, fila, col, tamaño, orientacion):
+def CabeBarco(tablero, fila, col, tamaño):
+    limite_filas = len(tablero)
+    limite_cols = len(tablero[0])
 
-    if orientacion == 'H':
+    if col + tamaño <= limite_cols:
+        cabe = True
         for i in range(tamaño):
-            if tableroIA[fila][col + i] == 0:  # Agua confirmada
-                return False
+            if tablero[fila][col + i] != 0:
+                cabe = False
+        if cabe:
+            return True
 
-    else:  # Vertical
+    if col - tamaño + 1 >= 0:
+        cabe = True
         for i in range(tamaño):
-            if tableroIA[fila + i][col] == 0:  # Agua confirmada
-                return False
+            if tablero[fila][col - i] != 0:
+                cabe = False
+        if cabe:
+            return True
 
-    return True
+    if fila + tamaño <= limite_filas:
+        cabe = True
+        for i in range(tamaño):
+            if tablero[fila + i][col] != 0:
+                cabe = False
+        if cabe:
+            return True
+
+    if fila - tamaño + 1 >= 0:
+        cabe = True
+        for i in range(tamaño):
+            if tablero[fila - i][col] != 0:
+                cabe = False
+        if cabe:
+            return True
+
+    return False
 
 # calcularProbabilidades: Calcula la probabilidad de cada casilla según los barcos que caben
 
