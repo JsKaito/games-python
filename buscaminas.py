@@ -43,7 +43,7 @@ class Juego:
         return True
 
     def _flood_fill(self, f, c):
-        # Revelar casillas adyacentes si es 0
+        # Revelar casillas cercanas si es 0
         for i in range(-1, 2):
             for j in range(-1, 2):
                 nf, nc = f + i, c + j
@@ -76,5 +76,5 @@ class Juego:
         for f in range(self.tamaño):
             for c in range(self.tamaño):
                 if self.marcado[f, c] and mostrado[f, c] == "#":
-                    mostrado[f, c] = "F"
+                    mostrado[f, c] = "B"
         return mostrado
