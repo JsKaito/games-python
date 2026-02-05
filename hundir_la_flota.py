@@ -15,7 +15,6 @@ import random as rd
 
 # ! ZONA DEBUG
 tamaño = 10
-opcionesIA, opcionesUser = set(), set()
 movimiento = ("A", 1)
 ultimoMovimiento = 0
 objetivos = []
@@ -68,7 +67,7 @@ def colocarBarcos(barcos):
             for fila in range(10):
                 print(fila + 1, end="  ")
                 for col in range(10):
-                    if tablero[fila][col] == 0:
+                    if tableroUser[fila][col] == 0:
                         print("~", end=" ")
                     else:
                         print("■", end=" ")
@@ -101,23 +100,23 @@ def colocarBarcos(barcos):
             # Comprobar si pisa otro barco
             if cabe:
                 if orientacion == "H":
-                    for i in range(tamaño):
-                        if tablero[fila][columna + i] == 1:
+                    for i in range(barco["tamaño"]):
+                        if tableroUser[fila][columna + i] == 1:
                             cabe = False
                 else:
-                    for i in range(tamaño):
-                        if tablero[fila + i][columna] == 1:
+                    for i in range(barco["tamaño"]):
+                        if tableroUser[fila + i][columna] == 1:
                             cabe = False
                             
             # Colocar barco
             if cabe:
                 if orientacion == "H":
-                    for i in range(tamaño):
-                        tablero[fila][columna + i] = 1
+                    for i in range(barco["tamaño"]):
+                        tableroUser[fila][columna + i] = 1
                         barco["coordenadas"].append((fila, columna + i))
                 elif orientacion == "V":
-                    for i in range(tamaño):
-                        tablero[fila + i][columna] = 1
+                    for i in range(barco["tamaño"]):
+                        tableroUser[fila + i][columna] = 1
                         barco["coordenadas"].append((fila + i, columna))
                 colocado = True
             else:
@@ -141,12 +140,18 @@ def revisarBarcos(barcos, casillasTocadas):
 def crearOpciones():
     '''
     Crea las listas de opciones del usuario y de la IA.
+    
+    Returns:
+        opciones (set): Opciones de movimiento.
     '''
+    
+    opciones = set()
     
     for i in range(1, tamaño + 1):
         for j in range (1, tamaño + 1):
-            opcionesIA.add((i, j))
-            opcionesUser.add((i, j))
+            opciones.add((i, j))
+            
+    return opciones
 
 
 def crearTablero(tamaño=10):
@@ -243,7 +248,36 @@ def hunt(casillasTocadas):
     posiblesAtaques = [opcion for opcion in posiblesAtaques if opcion in opcionesIA]
 
     return posiblesAtaques
+
     
+#* Pulled from branch "Games/alfonso"
+
+def barcoCabe(fila, col, tamaño, orientacion):
+    '''
+    Verifica si un barco puede caber en una zona específica del tablero,
+    considerando las casillas de agua (-1).
+    
+    Args:
+        fila (int): Fila inicial
+        col (int): Columna inicial
+        tamaño (int): Tamaño del barco
+        orientacion (str): 'H' para horizontal, 'V' para vertical
+        
+    Returns:
+        bool: True si el barco puede caber, False en caso contrario
+    '''
+    
+    if orientacion == 'H':
+        for i in range(tamaño):
+            if col + i >= len(tableroIA) or tableroIA[fila][col + i] == -1 or (fila + 1, col + 1 + i) not in opcionesIA:
+                return False
+    elif orientacion == 'V':
+        for i in range(tamaño):
+            if fila + i >= len(tableroIA) or tableroIA[fila + i][col] == -1 or (fila + 1 + i, col + 1) not in opcionesIA:
+                return False
+    
+    return True
+
 
 #TODO Función de ataque según probabilidades
 def calcularProbabilidades(barcos):
@@ -258,45 +292,14 @@ def calcularProbabilidades(barcos):
     probabilidades = np.zeros((tamaño, tamaño))
     
     for barco in barcos: #que no este hundido
-        for i in range(1, tamaño + 1):
-            for j in range(1, tamaño + 1):
+        for i in range(tamaño):
+            for j in range(tamaño):
                 if barcoCabe(i, j, barco["tamaño"], 'H'):
                     probabilidades[i][j] += 1
                 if barcoCabe(i, j, barco["tamaño"], 'V'):
                     probabilidades[i][j] += 1
 
     return probabilidades
-
-    
-#* Pulled from branch "Games/alfonso"
-
-def barcoCabe(fila, col, tamaño, orientacion):
-    '''
-    Verifica si un barco puede caber en una zona específica del tablero,
-    considerando las casillas de agua (-1).
-    
-    Args:
-        tableroIA (ndarray): Tablero de la IA
-        fila (int): Fila inicial
-        col (int): Columna inicial
-        tamaño (int): Tamaño del barco
-        orientacion (str): 'H' para horizontal, 'V' para vertical
-        
-    Returns:
-        bool: True si el barco puede caber, False en caso contrario
-    '''
-    
-    if orientacion == 'H':
-        for i in range(tamaño):
-            if tableroIA[fila][col + i] == -1 or (fila + 1, col + 1 + i) not in opcionesIA:  # Agua confirmada
-                return False
-                
-    elif orientacion == 'V':
-        for i in range(tamaño):
-            if tableroIA[fila + i][col] == -1 or (fila + 1 + i, col + 1) not in opcionesIA:  # Agua confirmada
-                return False
-    
-    return True
 
 
 #* Pulled from branch "Games/lucia"
@@ -328,6 +331,16 @@ def aplicarPatronTablero(probabilidades, opcionesIA):
     #TODO pensarAtaque: Piensa el ataque teniendo en cuenta los valores de las funciones anteriores
     #! FER
 
+
+def traducir(coordenada):
+    letra, num = coordenada
+    
+    x = {"A": 0, "B": 1, "C": 2, "D": 3, "E": 4, "F": 5, "G": 6, "H": 7, "I": 8, "J": 9}
+    num -= 1
+    
+    return (num, x[letra])
+    
+    
 # def pensarAtaque(tableroIA, casillasTocadas):
 
 
@@ -336,7 +349,11 @@ def aplicarPatronTablero(probabilidades, opcionesIA):
 '''FLUJO DEL PROGRAMA'''
 tableroIA = crearTablero()
 tableroUser = crearTablero()
-crearOpciones()
+
+opcionesIA = crearOpciones()
+opcionesUser = crearOpciones()
+
 
 barcos = crearBarcos()
+
 calcularProbabilidades(barcos)
