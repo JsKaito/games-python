@@ -434,10 +434,15 @@ def pensarAtaque(casillasTocadas):
     
     return ataque
 
-def atacar(coordenada):
+def atacar():
     # TODO Función que ataque a casilla del tablero del usuario (TableroIA)
-    ataque = pensarAtaque(casillasTocadas)
+    x, y = pensarAtaque(casillasTocadas)
     
+    #! IMPORTANTE
+    # TODO Verificar si el ataque está en alguna coordenada de algún barco en el diccionario de barcos.
+    
+    if tableroUser[x][y] == -1:
+    return True
 
 
 
