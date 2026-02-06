@@ -383,14 +383,13 @@ def calcularProbabilidades(barcos):
 
 #* Pulled from branch "Games/lucia"
 
-def aplicarPatronTablero(probabilidades, opcionesIA):
+def aplicarPatronTablero(probabilidades):
     '''
     Aplica un patrón de tablero de ajedrez para optimizar ataques.
     El patrón favorece a la IA ya que los barcos miden 2 o más casillas
     
     Args:
         probabilidades (ndarray): Matriz de probabilidades
-        opcionesIA (set): Coordenadas disponibles
         
     Returns:
         probabilidades(ndarray): Matriz de probabilidades actualizadas con el patrón
@@ -407,32 +406,40 @@ def aplicarPatronTablero(probabilidades, opcionesIA):
     return probabilidades
 
 
-    #TODO pensarAtaque: Piensa el ataque teniendo en cuenta los valores de las funciones anteriores
-def pensarAtaque(tableroIA, casillasTocadas):
+def pensarAtaque(casillasTocadas):
     
     probabilidades = calcularProbabilidades(barcos)
-    #TODO 1. HAY TOCADAS?
+    probabilidades = aplicarPatronTablero(probabilidades)
+    
     if casillasTocadas:
-        probables = hunt(casillasTocadas)
-        #TODO 2. SI HAY, ACTIVA HUNT -> MIRA CHANCES DE ESAS CASILLAS Y ATACA A LA DE MAYOR CHANCE (RD SI EMPATE)
-        valores = []
-        for x, y in probables:
-            probabilidades[x][y]
-            valores.append(((x,y), probabilidades[x][y]))
+        casillasProbables = hunt(casillasTocadas)
+
+        valores = [
+            ((x, y), probabilidades[x][y])
+            for x, y in casillasProbables
+            ]
+
+    else:
+        valores = [
+            ((x, y), probabilidades[x][y])
+            for x, y in opcionesIA
+            ]
         
-        for coord, prob in valores:
-            tuplaMax = max(valores, key=lambda x: x[1]) # Una funcion lambda que compara el segundo elemento (probabilidades) y devuelve la tupla que lo contiene
-        coord = tuplaMax[0]
-            
-            
-            
+    if not valores:
+        return rd.choice(opcionesIA)
+    
+    maxProb = max(valores, key=lambda x: x[1])[1] # Obtiene mayor probabilidad
+    valores = [coord for coord, prob in valores if prob == maxProb] # Mira aquellas coordenadas con mayor probabilidad
+    ataque = rd.choice(valores)
+    
+    return ataque
 
-            
+def atacar(coordenada):
+    # TODO Función que ataque a casilla del tablero del usuario (TableroIA)
+    ataque = pensarAtaque(casillasTocadas)
+    
 
 
-
-#TODO 3. SI NO HAY, SELECCIONA LA CASILLA GENERAL CON MÁS CHANCE (RD SI EMPATE)
-#TODO 4. APLICAR ESTRATEGIA AJEDREZ
 
 def traducir(coordenada):
     letra, num = coordenada
