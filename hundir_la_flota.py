@@ -147,8 +147,8 @@ def crearOpciones():
     
     opciones = set()
     
-    for i in range(1, tamaño + 1):
-        for j in range (1, tamaño + 1):
+    for i in range(tamaño):
+        for j in range (tamaño):
             opciones.add((i, j))
             
     return opciones
@@ -267,13 +267,26 @@ def barcoCabe(fila, col, tamaño, orientacion):
         bool: True si el barco puede caber, False en caso contrario
     '''
     
-    if orientacion == 'H':
+    limite = len(tableroIA)
+
+    if orientacion == 'izquierda':
         for i in range(tamaño):
-            if col + i >= len(tableroIA) or tableroIA[fila][col + i] == -1 or (fila + 1, col + 1 + i) not in opcionesIA:
+            if col - i < 0 or tableroIA[fila][col - i] == -1 or (fila, col - i) not in opcionesIA:
                 return False
-    elif orientacion == 'V':
+            
+    elif orientacion == 'derecha':
         for i in range(tamaño):
-            if fila + i >= len(tableroIA) or tableroIA[fila + i][col] == -1 or (fila + 1 + i, col + 1) not in opcionesIA:
+            if col + i >= limite or tableroIA[fila][col + i] == -1 or (fila, col + i) not in opcionesIA:
+                return False
+            
+    elif orientacion == 'arriba':
+        for i in range(tamaño):
+            if fila - i < 0 or tableroIA[fila - i][col] == -1 or (fila - i, col) not in opcionesIA:
+                return False
+            
+    elif orientacion == 'abajo':
+        for i in range(tamaño):
+            if fila + i >= limite or tableroIA[fila + i][col] == -1 or (fila + i, col) not in opcionesIA:
                 return False
     
     return True
@@ -291,13 +304,18 @@ def calcularProbabilidades(barcos):
     
     probabilidades = np.zeros((tamaño, tamaño))
     
-    for barco in barcos: #que no este hundido
+    for barco in barcos: #TODO que no este hundido
         for i in range(tamaño):
             for j in range(tamaño):
-                if barcoCabe(i, j, barco["tamaño"], 'H'):
+                if barcoCabe(i, j, barco["tamaño"], 'izquierda'):
                     probabilidades[i][j] += 1
-                if barcoCabe(i, j, barco["tamaño"], 'V'):
+                if barcoCabe(i, j, barco["tamaño"], 'derecha'):
                     probabilidades[i][j] += 1
+                if barcoCabe(i, j, barco["tamaño"], 'arriba'):
+                    probabilidades[i][j] += 1
+                if barcoCabe(i, j, barco["tamaño"], 'abajo'):
+                    probabilidades[i][j] += 1
+    
 
     return probabilidades
 
@@ -356,6 +374,9 @@ opcionesUser = crearOpciones()
 
 barcos = crearBarcos()
 
-# TODO el mapa de calor no funciona bien
+for i in range(7):
+    tableroIA[rd.randint(0, 9)][rd.randint(0, 9)] = -1
+
+
 probabilidades = calcularProbabilidades(barcos)
 print(probabilidades.astype(int))
