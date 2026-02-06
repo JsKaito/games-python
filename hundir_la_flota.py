@@ -419,7 +419,7 @@ def aplicarPatronTablero(probabilidades):
 
 def pensarAtaque(casillasTocadas):
     
-    probabilidades = calcularProbabilidades(barcos)
+    probabilidades = calcularProbabilidades(barcosUser)
     probabilidades = aplicarPatronTablero(probabilidades)
     
     if casillasTocadas:
@@ -463,6 +463,8 @@ def atacar(coord):
 
 
 '''FLUJO DEL PROGRAMA'''
+
+# Se crean los barcos, tableros y opciones para ambos jugadores
 barcosIA = crearBarcos()
 barcosUser = crearBarcos()
 
@@ -472,13 +474,19 @@ tableroUser = crearTablero()
 opcionesIA = crearOpciones()
 opcionesUser = crearOpciones()
 
-barcos = crearBarcos()
 
 colocarBarcosUsuarioAleatorio(barcosUser, tableroUser)
 #colocarBarcos(barcosUser)
 
 print(tableroUser)
 
-if atacar(pensarAtaque(casillasTocadas)):
-    print("CHAT: ¡La IA ha acertado un barco! Le toca de nuevo.")
-    print(atacar(pensarAtaque(casillasTocadas)))
+
+while True:
+    coord = pensarAtaque(casillasTocadas)
+    print(f"JUEGO: IA ataca a: {coord}")
+    if atacar(coord):
+        print("JUEGO: ¡La IA ha TOCADO un barco! Le toca de nuevo.")
+        continue
+    else:
+        print("JUEGO: AGUA. Fin del turno IA.")
+        break
