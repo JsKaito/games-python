@@ -188,6 +188,9 @@ def revisarBarcos(barcos, casillasTocadas):
     for barco in barcos:
         if all(coordenada in casillasTocadas for coordenada in barco["coordenadas"]) and barco["hundido"] == False:
             barco["hundido"] = True
+            for x, y in barco["coordenadas"]:
+                casillasTocadas.discard((x, y))
+                tableroIA[x][y] = -1
 
 
 def crearOpciones():
@@ -308,14 +311,19 @@ def hunt(casillasTocadas):
 def barcoCabe(fila, col, tamaño, orientacion):
     '''
     Verifica si un barco puede caber en una zona específica del tablero,
-    considerando las casillas de agua (-1).
-    
+    considerando las casillas de agua (-1) y las coordenadas disponibles.
+
     Args:
-        fila (int): Fila inicial
-        col (int): Columna inicial
+        fila (int): Fila inicial (0-based, índice de la matriz)
+        col (int): Columna inicial (0-based, índice de la matriz)
         tamaño (int): Tamaño del barco
-        orientacion (str): 'H' para horizontal, 'V' para vertical
-        
+        orientacion (str): 'izquierda', 'derecha', 'arriba', 'abajo'
+
+    Restricciones:
+        - El barco no puede salirse del tablero.
+        - No puede ocupar casillas marcadas como agua (-1).
+        - Todas las casillas deben estar en opcionesIA (coordenadas 0-based).
+
     Returns:
         bool: True si el barco puede caber, False en caso contrario
     '''
@@ -357,7 +365,7 @@ def calcularProbabilidades(barcos):
     
     probabilidades = np.zeros((tamaño, tamaño))
     
-    for barco in barcos: #TODO que no este hundido
+    for barco in [b for b in barcos if not b["hundido"]]:
         for i in range(tamaño):
             for j in range(tamaño):
                 if barcoCabe(i, j, barco["tamaño"], 'izquierda'):
@@ -400,8 +408,17 @@ def aplicarPatronTablero(probabilidades, opcionesIA):
 
 
     #TODO pensarAtaque: Piensa el ataque teniendo en cuenta los valores de las funciones anteriores
-    #! FER
+def pensarAtaque(tableroIA, casillasTocadas):
+    print()
+#TODO 1. HAY TOCADAS?
+    if casillasTocadas:
+        probables = hunt(casillasTocadas)
+        for coord in probables:
 
+
+#TODO 2. SI HAY, ACTIVA HUNT -> MIRA CHANCES DE ESAS CASILLAS Y ATACA A LA DE MAYOR CHANCE (RD SI EMPATE)
+#TODO 3. SI NO HAY, SELECCIONA LA CASILLA GENERAL CON MÁS CHANCE (RD SI EMPATE)
+#TODO 4. APLICAR ESTRATEGIA AJEDREZ
 
 def traducir(coordenada):
     letra, num = coordenada
@@ -410,11 +427,6 @@ def traducir(coordenada):
     num -= 1
     
     return (num, x[letra])
-    
-    
-# def pensarAtaque(tableroIA, casillasTocadas):
-
-
 
 
 '''FLUJO DEL PROGRAMA'''
@@ -423,7 +435,6 @@ tableroUser = crearTablero()
 
 opcionesIA = crearOpciones()
 opcionesUser = crearOpciones()
-
 
 barcos = crearBarcos()
 
