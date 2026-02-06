@@ -1,7 +1,7 @@
 # --- TEST: Colocar barcos aleatorios para usuario ---
 def colocarBarcosUsuarioAleatorio(barcos, tablero):
     '''Coloca los barcos del usuario de forma aleatoria en el tablero (solo para test)'''
-    for barco in barcos:
+    for barco in barcosUser:
         tamaño = barco["tamaño"]
         colocado = False
         while not colocado:
@@ -57,8 +57,8 @@ objetivos = []
 casillasTocadas = set()
 
 
+''' GAME CONTROLLER '''
 
-#* Pulled from branch "Games/lucia", modified
 
 def crearBarcos():
     '''
@@ -77,63 +77,47 @@ def crearBarcos():
     ]
     return barcos
 
-barcosIA = crearBarcos()
-barcosUser = crearBarcos()
 
-
-#* Pulled from branch "Games/lucia", modified
-
-def colocarBarcos(barcos):
+def colocarBarcos(barcosUser):
     '''
-    Coloca los barcos del jugador en el tablero 
-    
+    Coloca los barcos del jugador en el tablero, usando la función traducir para guardar coordenadas en formato (letra, número)
     Args:
         barcos (tuple list): Lista con barcos y tamaño
     '''
-    
-    for barco in barcos:
-        
+    letras = "ABCDEFGHIJ"
+    for barco in barcosUser:
         nombre = barco["nombre"]
         tamaño = barco["tamaño"]
         colocado = False
-        
         while not colocado:
-            # Mostrar tablero
-            print("\n  1 2 3 4 5 6 7 8 9 10")
+            # Mostrar tablero con letras como filas
+            print("   " + " ".join([str(i+1) for i in range(10)]))
             for fila in range(10):
-                print(fila + 1, end="  ")
+                print(letras[fila], end="  ")
                 for col in range(10):
                     if tableroUser[fila][col] == 0:
                         print("~", end=" ")
                     else:
                         print("■", end=" ")
                 print()
-
             print(f"\nColoca tu {nombre} (tamaño {tamaño})")
-            # Pedir datos
-            fila = int(input("Fila (1-10): ")) - 1
-            columna = int(input("Columna (1-10): ")) - 1
+            letra = input("Letra (A-J): ").upper()
+            num = int(input("Número (1-10): "))
             orientacion = input("Orientación (H/V): ").upper()
-
-            if fila < 0 or fila > 9 or columna < 0 or columna > 9:
-                print("Fila o columna fuera del tablero")
+            if letra not in letras or num < 1 or num > 10:
+                print("Letra o número fuera del tablero")
                 continue
-            # Comprobar si cabe
+            fila, columna = traducir("back", (letra, num))
             cabe = True
-            
             if orientacion == "H":
                 if columna + tamaño > 10:
                     cabe = False
-                    
             elif orientacion == "V":
                 if fila + tamaño > 10:
                     cabe = False
-                    
             else:
                 print("Orientación incorrecta")
                 continue
-            
-            # Comprobar si pisa otro barco
             if cabe:
                 if orientacion == "H":
                     for i in range(barco["tamaño"]):
@@ -143,73 +127,18 @@ def colocarBarcos(barcos):
                     for i in range(barco["tamaño"]):
                         if tableroUser[fila + i][columna] == 1:
                             cabe = False
-                            
-            # Colocar barco
             if cabe:
                 if orientacion == "H":
                     for i in range(barco["tamaño"]):
                         tableroUser[fila][columna + i] = 1
-                        barco["coordenadas"].append((fila, columna + i))
+                        barco["coordenadas"].append(traducir("front", (fila, columna + i)))
                 elif orientacion == "V":
                     for i in range(barco["tamaño"]):
                         tableroUser[fila + i][columna] = 1
-                        barco["coordenadas"].append((fila + i, columna))
+                        barco["coordenadas"].append(traducir("front", (fila + i, columna)))
                 colocado = True
             else:
                 print("No se puede colocar ahí. Intentalo de nuevo.")
-
-
-#* Pulled from branch "Games/lucia", modified
-                
-def colocarBarcosIA(barcos, tablero_ia):
-    '''
-    Coloca los barcos de la IA en el tablero automáticamente
-    
-    Args:
-        barcos (tuple list): Lista con barcos y tamaño
-        tablero_ia (tuple ndarray): Tablero de la IA
-    '''
-
-    for barco, tamaño in barcos:
-
-        colocado = False
-        while not colocado:
-
-            # Elegir posición aleatoria
-            fila = rd.randint(0, 9)
-            columna = rd.randint(0, 9)
-            orientacion = rd.choice(["H", "V"])
-
-            # Comprobar si cabe
-            cabe = True
-
-            if orientacion == "H":
-                if columna + tamaño > 10:
-                    cabe = False
-            else:  # V
-                if fila + tamaño > 10:
-                    cabe = False
-
-            # Comprobar si pisa otro barco
-            if cabe:
-                if orientacion == "H":
-                    for i in range(tamaño):
-                        if tablero_ia[fila][columna + i] == 1:
-                            cabe = False
-                else:
-                    for i in range(tamaño):
-                        if tablero_ia[fila + i][columna] == 1:
-                            cabe = False
-
-            # Colocar barco
-            if cabe:
-                if orientacion == "H":
-                    for i in range(tamaño):
-                        tablero_ia[fila][columna + i] = 1
-                else:
-                    for i in range(tamaño):
-                        tablero_ia[fila + i][columna] = 1
-                colocado = True
 
 
 def crearOpciones(tamaño = 10):
@@ -243,6 +172,90 @@ def crearTablero(tamaño=10):
     return tablero
 
 
+def revisarBarcos(barcosUser, casillasTocadas):
+    '''
+    Revisa si los barcos han sido hundidos al final de cada turno.
+    
+    Args:
+        barcos (list): Lista de diccionarios de barcos.
+        casillasTocadas (set): Conjunto de coordenadas tocadas.
+    '''
+
+    for barco in barcosUser:
+        if all(coordenada in casillasTocadas for coordenada in barco["coordenadas"]) and barco["hundido"] == False:
+            for x, y in barco["coordenadas"]:
+                casillasTocadas.discard((x, y))
+                tableroUser[x][y] = -1
+            barco["hundido"] = True
+
+
+def traducir(modo, coordenada):
+    letras = "ABCDEFGHIJ"
+    
+    if modo == "front":
+        letra, num = coordenada
+        return (letras[letra], num + 1)
+    
+    elif modo == "back":
+        x, y = coordenada
+        return (letras.index(x), y - 1)
+
+
+def colocarBarcosIA(barcosIA, tableroIA):
+    '''
+    Coloca los barcos de la IA en el tablero automáticamente
+    
+    Args:
+        barcos (tuple list): Lista con barcos y tamaño
+        tablero_ia (tuple ndarray): Tablero de la IA
+    '''
+
+    for _, tamaño in barcosIA:
+
+        colocado = False
+        while not colocado:
+
+            # Elegir posición aleatoria
+            fila = rd.randint(0, 9)
+            columna = rd.randint(0, 9)
+            orientacion = rd.choice(["H", "V"])
+
+            # Comprobar si cabe
+            cabe = True
+
+            if orientacion == "H":
+                if columna + tamaño > 10:
+                    cabe = False
+            else:  # V
+                if fila + tamaño > 10:
+                    cabe = False
+
+            # Comprobar si pisa otro barco
+            if cabe:
+                if orientacion == "H":
+                    for i in range(tamaño):
+                        if tableroIA[fila][columna + i] == 1:
+                            cabe = False
+                else:
+                    for i in range(tamaño):
+                        if tableroIA[fila + i][columna] == 1:
+                            cabe = False
+
+            # Colocar barco
+            if cabe:
+                if orientacion == "H":
+                    for i in range(tamaño):
+                        tableroIA[fila][columna + i] = 1
+                else:
+                    for i in range(tamaño):
+                        tableroIA[fila + i][columna] = 1
+                colocado = True
+
+
+
+''' OPONENTE IA'''
+
+
 def obtenerAdyacentes(coordenada):
     '''Obtiene las coordenadas adyacentes a otra
 
@@ -270,48 +283,6 @@ def obtenerAdyacentes(coordenada):
 
     return adyacentes
 
-
-def hunt(casillasTocadas):
-    
-    '''
-    La IA iniciará un modo cacería siempre que queden casillas en estado "tocado"
-    
-    Args:
-        casillasTocadas (tuple list): Lista de tuplas de casillas tocadas
-        
-    Returns:
-        posiblesAtaques (tuple list): Lista de tuplas de posibles ataques
-    '''
-    
-    if not casillasTocadas: # Comprueba si hay elementos en el array
-        return []
-    
-    posiblesAtaques = []
-    if len(casillasTocadas) >= 2: # Línea
-
-        xs = {x for x, y in casillasTocadas}
-        ys = {y for x, y in casillasTocadas}
-        
-        if len(xs) == 1 and max(ys) - min(ys) + 1 == len(ys): # Si las 'x' son iguales y las 'y' son continuas, el barco está en vertical
-            x = next(iter(xs))
-            posiblesAtaques = [(x, min(ys)-1), (x, max(ys)+1)]
-        
-        elif len(ys) == 1 and max(xs) - min(xs) + 1 == len(xs): # Si las 'y' son iguales y las 'x' son continuas, el barco está en horizontal 
-            y = next(iter(ys))
-            posiblesAtaques = [(min(xs)-1, y), (max(xs)+1, y)]
-
-    if not posiblesAtaques: # Si no encuentra línea, devuelve las adyacentes del tocado
-        for tocado in casillasTocadas:
-            posiblesAtaques.extend(obtenerAdyacentes(tocado))
-            
-    # Esta línea es List Comprehension. Crea una lista nueva usando una antigua de forma directa, sin necesidad de crear una nueva lista auxiliar
-    # Verifica que la 'x' y la 'y' estén entre 1 y 10 (ya que si no, no está en la lista de opcionesIA), y que la opción sea posible para la IA
-    posiblesAtaques = [opcion for opcion in posiblesAtaques if opcion in opcionesIA]
-
-    return posiblesAtaques
-
-    
-#* Pulled from branch "Games/alfonso"
 
 def barcoCabe(fila, col, tamañoBarco, orientacion, limite = 10):
     '''
@@ -356,7 +327,46 @@ def barcoCabe(fila, col, tamañoBarco, orientacion, limite = 10):
     return True
 
 
-#TODO Función de ataque según probabilidades
+def hunt(casillasTocadas):
+    
+    '''
+    La IA iniciará un modo cacería siempre que queden casillas en estado "tocado"
+    
+    Args:
+        casillasTocadas (tuple list): Lista de tuplas de casillas tocadas
+        
+    Returns:
+        posiblesAtaques (tuple list): Lista de tuplas de posibles ataques
+    '''
+    
+    if not casillasTocadas: # Comprueba si hay elementos en el array
+        return []
+    
+    posiblesAtaques = []
+    if len(casillasTocadas) >= 2: # Línea
+
+        xs = {x for x, y in casillasTocadas}
+        ys = {y for x, y in casillasTocadas}
+        
+        if len(xs) == 1 and max(ys) - min(ys) + 1 == len(ys): # Si las 'x' son iguales y las 'y' son continuas, el barco está en vertical
+            x = next(iter(xs))
+            posiblesAtaques = [(x, min(ys)-1), (x, max(ys)+1)]
+        
+        elif len(ys) == 1 and max(xs) - min(xs) + 1 == len(xs): # Si las 'y' son iguales y las 'x' son continuas, el barco está en horizontal 
+            y = next(iter(ys))
+            posiblesAtaques = [(min(xs)-1, y), (max(xs)+1, y)]
+
+    if not posiblesAtaques: # Si no encuentra línea, devuelve las adyacentes del tocado
+        for tocado in casillasTocadas:
+            posiblesAtaques.extend(obtenerAdyacentes(tocado))
+            
+    # Esta línea es List Comprehension. Crea una lista nueva usando una antigua de forma directa, sin necesidad de crear una nueva lista auxiliar
+    # Verifica que la 'x' y la 'y' estén entre 1 y 10 (ya que si no, no está en la lista de opcionesIA), y que la opción sea posible para la IA
+    posiblesAtaques = [opcion for opcion in posiblesAtaques if opcion in opcionesIA]
+
+    return posiblesAtaques
+
+
 def calcularProbabilidades(barcos):
     '''
     Calcula las probabilidades de ataque de la IA en función del tablero del usuario y los barcos restantes.
@@ -393,7 +403,7 @@ def aplicarPatronTablero(probabilidades):
         probabilidades (ndarray): Matriz de probabilidades
         
     Returns:
-        probabilidades(ndarray): Matriz de probabilidades actualizadas con el patrón
+        probabilidades (ndarray): Matriz de probabilidades actualizadas con el patrón
     '''
     
     tamaño = len(probabilidades)
@@ -436,49 +446,26 @@ def pensarAtaque(casillasTocadas):
     return ataque
 
 
-def atacar():
+def atacar(coord):
     # TODO Función que ataque a casilla del tablero del usuario (TableroIA)
-    coord = pensarAtaque(casillasTocadas)
     
     #! IMPORTANTE
     # TODO Verificar si el ataque está en alguna coordenada de algún barco en el diccionario de barcos.
     
-    for barco in barcosIA:
+    for barco in barcosUser:
         if coord in barco["coordenadas"]:
             casillasTocadas.add(coord)
             opcionesIA.discard(coord)
+            
+            return True
+    return False
 
-
-def revisarBarcos(barcos, casillasTocadas):
-    '''
-    Revisa si los barcos han sido hundidos al final de cada turno.
-    
-    Args:
-        barcos (list): Lista de diccionarios de barcos.
-        casillasTocadas (set): Conjunto de coordenadas tocadas.
-    '''
-
-    for barco in barcos:
-        if all(coordenada in casillasTocadas for coordenada in barco["coordenadas"]) and barco["hundido"] == False:
-            for x, y in barco["coordenadas"]:
-                casillasTocadas.discard((x, y))
-                tableroIA[x][y] = -1
-            barco["hundido"] = True
-
-
-def traducir(modo, coordenada):
-    letras = "ABCDEFGHIJ"
-    
-    if modo == "front":
-        letra, num = coordenada
-        return (letras[letra], num + 1)
-    
-    elif modo == "back":
-        x, y = coordenada
-        return (letras.index(x), y - 1)
 
 
 '''FLUJO DEL PROGRAMA'''
+barcosIA = crearBarcos()
+barcosUser = crearBarcos()
+
 tableroIA = crearTablero()
 tableroUser = crearTablero()
 
@@ -487,7 +474,11 @@ opcionesUser = crearOpciones()
 
 barcos = crearBarcos()
 
-colocarBarcosUsuarioAleatorio(barcos, tableroUser)
+colocarBarcosUsuarioAleatorio(barcosUser, tableroUser)
+#colocarBarcos(barcosUser)
+
 print(tableroUser)
 
-print(pensarAtaque(casillasTocadas))
+if atacar(pensarAtaque(casillasTocadas)):
+    print("CHAT: ¡La IA ha acertado un barco! Le toca de nuevo.")
+    print(atacar(pensarAtaque(casillasTocadas)))
