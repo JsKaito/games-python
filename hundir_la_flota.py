@@ -409,14 +409,28 @@ def aplicarPatronTablero(probabilidades, opcionesIA):
 
     #TODO pensarAtaque: Piensa el ataque teniendo en cuenta los valores de las funciones anteriores
 def pensarAtaque(tableroIA, casillasTocadas):
-    print()
-#TODO 1. HAY TOCADAS?
+    
+    probabilidades = calcularProbabilidades(barcos)
+    #TODO 1. HAY TOCADAS?
     if casillasTocadas:
         probables = hunt(casillasTocadas)
-        for coord in probables:
+        #TODO 2. SI HAY, ACTIVA HUNT -> MIRA CHANCES DE ESAS CASILLAS Y ATACA A LA DE MAYOR CHANCE (RD SI EMPATE)
+        valores = []
+        for x, y in probables:
+            probabilidades[x][y]
+            valores.append(((x,y), probabilidades[x][y]))
+        
+        for coord, prob in valores:
+            tuplaMax = max(valores, key=lambda x: x[1]) # Una funcion lambda que compara el segundo elemento (probabilidades) y devuelve la tupla que lo contiene
+        coord = tuplaMax[0]
+            
+            
+            
+
+            
 
 
-#TODO 2. SI HAY, ACTIVA HUNT -> MIRA CHANCES DE ESAS CASILLAS Y ATACA A LA DE MAYOR CHANCE (RD SI EMPATE)
+
 #TODO 3. SI NO HAY, SELECCIONA LA CASILLA GENERAL CON MÁS CHANCE (RD SI EMPATE)
 #TODO 4. APLICAR ESTRATEGIA AJEDREZ
 
