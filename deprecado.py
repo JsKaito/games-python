@@ -126,3 +126,16 @@ def asignarCasilla(tableroUser, coordenada):
     
     if opcion == 3:
         hundir_barco_si_tocado("user", coordenada)
+        
+def actualizarMovimientos(movimiento, jugador): # FALTA DECLARAR MOVIMIENTO
+    '''Actualiza la lista de movimientos del usuario o de la IA
+
+    Args:
+        movimiento (tuple): Representa la coordenada (x, y)
+        jugador (string: 'user' / 'ia'): Verifica si ataca el usuario o la IA
+    '''
+    
+    if jugador == "user":
+        opcionesUser.remove(movimiento)
+    elif jugador == "ia":
+        opcionesIA.remove(movimiento) # VIENE DE LA FUNCIÓN DE ATAQUE
