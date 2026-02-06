@@ -123,6 +123,59 @@ def colocarBarcos(barcos):
                 print("No se puede colocar ahí. Intentalo de nuevo.")
 
 
+#* Pulled from branch "Games/lucia", modified
+                
+def colocarBarcosIA(barcos, tablero_ia):
+    '''
+    Coloca los barcos de la IA en el tablero automáticamente
+    
+    Args:
+        barcos (tuple list): Lista con barcos y tamaño
+        tablero_ia (tuple ndarray): Tablero de la IA
+    '''
+
+    for barco, tamaño in barcos:
+
+        colocado = False
+        while not colocado:
+
+            # Elegir posición aleatoria
+            fila = rd.randint(0, 9)
+            columna = rd.randint(0, 9)
+            orientacion = rd.choice(["H", "V"])
+
+            # Comprobar si cabe
+            cabe = True
+
+            if orientacion == "H":
+                if columna + tamaño > 10:
+                    cabe = False
+            else:  # V
+                if fila + tamaño > 10:
+                    cabe = False
+
+            # Comprobar si pisa otro barco
+            if cabe:
+                if orientacion == "H":
+                    for i in range(tamaño):
+                        if tablero_ia[fila][columna + i] == 1:
+                            cabe = False
+                else:
+                    for i in range(tamaño):
+                        if tablero_ia[fila + i][columna] == 1:
+                            cabe = False
+
+            # Colocar barco
+            if cabe:
+                if orientacion == "H":
+                    for i in range(tamaño):
+                        tablero_ia[fila][columna + i] = 1
+                else:
+                    for i in range(tamaño):
+                        tablero_ia[fila + i][columna] = 1
+                colocado = True
+
+
 def revisarBarcos(barcos, casillasTocadas):
     '''
     Revisa si los barcos han sido hundidos al final de cada turno.
@@ -374,9 +427,6 @@ opcionesUser = crearOpciones()
 
 barcos = crearBarcos()
 
-for i in range(7):
-    tableroIA[rd.randint(0, 9)][rd.randint(0, 9)] = -1
-
-
 probabilidades = calcularProbabilidades(barcos)
+probabilidades = aplicarPatronTablero(probabilidades, opcionesIA)
 print(probabilidades.astype(int))
