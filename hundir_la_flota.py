@@ -224,20 +224,6 @@ def crearTablero(tamaño=10):
     return tablero
 
 
-def actualizarMovimientos(movimiento, jugador): # FALTA DECLARAR MOVIMIENTO
-    '''Actualiza la lista de movimientos del usuario o de la IA
-
-    Args:
-        movimiento (tuple): Representa la coordenada (x, y)
-        jugador (string: 'user' / 'ia'): Verifica si ataca el usuario o la IA
-    '''
-    
-    if jugador == "user":
-        opcionesUser.remove(movimiento)
-    elif jugador == "ia":
-        opcionesIA.remove(movimiento) # VIENE DE LA FUNCIÓN DE ATAQUE
-
-
 def obtenerAdyacentes(coordenada):
     '''Obtiene las coordenadas adyacentes a otra
 
@@ -436,13 +422,15 @@ def pensarAtaque(casillasTocadas):
 
 def atacar():
     # TODO Función que ataque a casilla del tablero del usuario (TableroIA)
-    x, y = pensarAtaque(casillasTocadas)
+    coord = pensarAtaque(casillasTocadas)
     
     #! IMPORTANTE
     # TODO Verificar si el ataque está en alguna coordenada de algún barco en el diccionario de barcos.
     
-    if tableroUser[x][y] == -1:
-    return True
+    for barco in barcosIA:
+        if coord in barco["coordenadas"]:
+            casillasTocadas.add(coord)
+            opcionesIA.discard(coord)
 
 
 
