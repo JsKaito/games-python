@@ -16,8 +16,9 @@ from time import sleep
 
 class User:
     ''' Esta clase contiene las funciones que corresponden al Usuario '''
-    # --- TEST: Colocar barcos aleatorios para usuario ---
-    def colocarBarcosUsuarioAleatorio(self, barcos, tablero):
+
+
+    def colocarBarcosAutomatico(self, barcos, tablero):
         '''Coloca los barcos del usuario de forma aleatoria en el tablero (solo para test).
 
         Args:
@@ -58,7 +59,8 @@ class User:
                             barco["coordenadas"].append((fila + i, columna))
                     colocado = True
 
-    def colocarBarcos(self, barcosUser, tablero):
+
+    def colocarBarcos(self, auto, barcosUser, tablero):
         '''
         Coloca los barcos del jugador en el tablero de forma interactiva.
         
@@ -295,9 +297,14 @@ class GameController:
         self.casillasTocadasIA = set()
         self.casillasTocadasUser = set()
 
-
-        # user.colocarBarcosUsuarioAleatorio(self.barcosUser, self.tableroUser)
-        user.colocarBarcos(self.barcosUser, self.tableroUser)
+        auto = input("¿Quieres colocar tus barcos de forma automática? (Si/No): ").strip().lower()
+        auto = True if auto == "si" else False
+        
+        if auto:
+            user.colocarBarcosAutomatico(self.barcosUser, self.tableroUser)
+        else:
+            user.colocarBarcos(self.barcosUser, self.tableroUser)
+            
         ia.colocarBarcos(self.barcosIA, self.tableroIA)
         
         print("\n" + "="*50)
