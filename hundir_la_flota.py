@@ -15,9 +15,15 @@ from time import sleep
 
 
 class User:
+    ''' Esta clase contiene las funciones que corresponden al Usuario '''
     # --- TEST: Colocar barcos aleatorios para usuario ---
     def colocarBarcosUsuarioAleatorio(self, barcos, tablero):
-        '''Coloca los barcos del usuario de forma aleatoria en el tablero (solo para test)'''
+        '''Coloca los barcos del usuario de forma aleatoria en el tablero (solo para test).
+
+        Args:
+            barcos (list): Lista de diccionarios con los barcos del usuario.
+            tablero (ndarray): Tablero donde se colocan los barcos.
+        '''
         for barco in barcos:
             tamaño = barco["tamaño"]
             colocado = False
@@ -54,9 +60,11 @@ class User:
 
     def colocarBarcos(self, barcosUser, tablero):
         '''
-        Coloca los barcos del jugador en el tablero, usando la función traducir para guardar coordenadas en formato (letra, número)
+        Coloca los barcos del jugador en el tablero de forma interactiva.
+        
         Args:
-            barcos (tuple list): Lista con barcos y tamaño
+            barcosUser (list): Lista de diccionarios con los barcos del usuario.
+            tablero (ndarray): Tablero donde se colocan los barcos.
         '''
         letras = "ABCDEFGHIJ"
         for barco in barcosUser:
@@ -75,11 +83,21 @@ class User:
                             print("■", end=" ")
                     print()
                 print(f"\nColoca tu {nombre} (tamaño {tamaño})")
-                letra = input("Letra (A-J): ").upper()
-                num = int(input("Número (1-10): "))
-                orientacion = input("Orientación (H/V): ").upper()
-                if letra not in letras or num < 1 or num > 10:
-                    print("Letra o número fuera del tablero")
+                letra = input("Letra (A-J): ").strip().upper()
+                if not letra or letra not in letras:
+                    print("Letra fuera de rango (A-J). Intentalo de nuevo.")
+                    continue
+                num_str = input("Número (1-10): ").strip()
+                if not num_str.isdigit():
+                    print("Número inválido. Intentalo de nuevo.")
+                    continue
+                num = int(num_str)
+                if num < 1 or num > 10:
+                    print("Número fuera de rango (1-10). Intentalo de nuevo.")
+                    continue
+                orientacion = input("Orientación (H/V): ").strip().upper()
+                if orientacion not in ("H", "V"):
+                    print("Orientación incorrecta. Intentalo de nuevo.")
                     continue
                 fila, columna = controller.traducir("back", (letra, num))
                 cabe = True
@@ -105,17 +123,26 @@ class User:
                     if orientacion == "H":
                         for i in range(barco["tamaño"]):
                             tablero[fila][columna + i] = 1
-                            barco["coordenadas"].append(controller.traducir("front", (fila, columna + i)))
+                            barco["coordenadas"].append((fila, columna + i))
                     elif orientacion == "V":
                         for i in range(barco["tamaño"]):
                             tablero[fila + i][columna] = 1
-                            barco["coordenadas"].append(controller.traducir("front", (fila + i, columna)))
+                            barco["coordenadas"].append((fila + i, columna))
                     colocado = True
                 else:
                     print("No se puede colocar ahí. Intentalo de nuevo.")
 
 
     def pensarAtaque(self, opcionesUser, controller):
+        '''Pide al usuario una coordenada válida para atacar.
+
+        Args:
+            opcionesUser (set): Coordenadas disponibles para atacar.
+            controller (GameController): Controlador del juego para traducir coordenadas.
+
+        Returns:
+            tuple: Coordenada (fila, columna) elegida por el usuario.
+        '''
         letras = "ABCDEFGHIJ"
         
         while True:
@@ -133,10 +160,8 @@ class User:
             if num < 1 or num > 10:
                 print("Número fuera de rango (1-10). Intenta de nuevo.")
                 continue
-            
-            entrada = (letras.index(letra), num)
 
-            coord = controller.traducir("back", entrada)
+            coord = controller.traducir("back", (letra, num))
             
             if coord not in opcionesUser:
                 print("Esta coordenada ya ha sido jugada. Ataca una coordenada nueva.")
@@ -145,16 +170,27 @@ class User:
             return coord
 
     def atacar(self, coord, barcos, opciones, casillasTocadas):
+        '''Ataca una coordenada del tablero enemigo.
+
+        Args:
+            coord (tuple): Coordenada (fila, columna) a atacar.
+            barcos (list): Lista de barcos enemigos.
+            opciones (set): Opciones de ataque disponibles.
+            casillasTocadas (set): Conjunto de casillas tocadas.
+
+        Returns:
+            bool: True si se tocó un barco, False si fue agua.
+        '''
+        opciones.discard(coord)
         for barco in barcos:
             if coord in barco["coordenadas"]:
                 casillasTocadas.add(coord)
-                opciones.discard(coord)
                 return True
         return False
         
 
 class GameController:
-    ''' Controla el juego '''
+    ''' Esta clase contiene las funciones que corresponden al Game Controller '''
 
     def crearBarcos(self):
         '''
@@ -202,23 +238,35 @@ class GameController:
         tablero = np.zeros((tamaño, tamaño), dtype=int)
         return tablero
 
-    def revisarBarcos(self, barcosUser, casillasTocadas, tablero, casillasTocadasOponente):
+    def revisarBarcos(self, barcos, casillasTocadas, tablero, casillasTocadasOponente):
         '''
         Revisa si los barcos han sido hundidos al final de cada turno.
         
         Args:
             barcos (list): Lista de diccionarios de barcos.
             casillasTocadas (set): Conjunto de coordenadas tocadas.
+            tablero (ndarray): Tablero donde están los barcos.
+            casillasTocadasOponente (set): Casillas tocadas del oponente (para limpiar al hundir).
         '''
 
-        for barco in barcosUser:
+        for barco in barcos:
             if all(coordenada in casillasTocadas for coordenada in barco["coordenadas"]) and barco["hundido"] == False:
                 for x, y in barco["coordenadas"]:
                     casillasTocadasOponente.discard((x, y))
                     tablero[x][y] = -1
                 barco["hundido"] = True
+                print(f"JUEGO  |  ¡¡{barco['nombre']} HUNDIDO!!")
 
     def traducir(self, modo, coordenada):
+        '''Traduce coordenadas entre formato visual (letra, número) y formato interno (fila, columna).
+
+        Args:
+            modo (str): "front" para (fila, col) → (letra, num), "back" para (letra, num) → (fila, col).
+            coordenada (tuple): La coordenada a traducir.
+
+        Returns:
+            tuple: La coordenada traducida.
+        '''
         letras = "ABCDEFGHIJ"
         
         if modo == "front":
@@ -230,6 +278,11 @@ class GameController:
             return (letras.index(x), y - 1)
 
     def empezarJuego(self):
+        '''Inicializa y arranca una nueva partida de Hundir la Flota.
+        
+        Crea barcos, tableros, opciones y casillas tocadas para ambos jugadores.
+        Coloca los barcos del usuario y de la IA, y comienza los turnos.
+        '''
         self.barcosIA = self.crearBarcos()
         self.barcosUser = self.crearBarcos()
 
@@ -243,54 +296,80 @@ class GameController:
         self.casillasTocadasUser = set()
 
 
-        user.colocarBarcosUsuarioAleatorio(self.barcosUser, self.tableroUser)
-        #user.colocarBarcos(self.barcosUser, self.tableroUser)
+        # user.colocarBarcosUsuarioAleatorio(self.barcosUser, self.tableroUser)
+        user.colocarBarcos(self.barcosUser, self.tableroUser)
         ia.colocarBarcos(self.barcosIA, self.tableroIA)
         
+        print("\n" + "="*50)
         print("JUEGO  |  Se elegirá aleatoriamente el primer turno. ¡Suerte!")
         
-        controller.jugarTurnos(rd.choice(["ia", "user"]))
+        turno = rd.choice(["ia", "user"])
+        nombre_turno = "IA" if turno == "ia" else "USUARIO"
+        print(f"JUEGO  |  ¡{nombre_turno} empieza la partida!")
+        print("="*50 + "\n")
+        
+        self.jugarTurnos(turno)
 
     def jugarTurnos(self, turno):
+        '''Ejecuta el bucle principal de turnos del juego.
+
+        Args:
+            turno (str): Indica quién empieza, "ia" o "user".
+        '''
         
         while not all(barco["hundido"] for barco in self.barcosIA) and not all(barco["hundido"] for barco in self.barcosUser):
             
             if turno == "ia":
                 coord = ia.pensarAtaque(self.casillasTocadasIA, self.barcosUser, self.tableroIA, self.opcionesIA)
-                print(f"JUEGO  |  ¡IA ataca a {coord}!")
+                coord_legible = self.traducir("front", coord)
+                print(f"\nJUEGO  |  ¡IA ataca a {coord_legible[0]}{coord_legible[1]}!")
                 if ia.atacar(coord, self.barcosUser, self.opcionesIA, self.casillasTocadasIA):
+                    self.revisarBarcos(self.barcosUser, self.casillasTocadasIA, self.tableroUser, self.casillasTocadasIA)
                     print("JUEGO  |  ¡TOCADO! La IA actúa de nuevo.")
                     sleep(1)
                     continue
                 else:
                     print("JUEGO  |  ¡AGUA! Fin del turno de la IA.")
+                    print("-"*40)
                     turno = "user"
                     continue
             
             if turno == "user":
-                coord = user.pensarAtaque(self.opcionesUser, controller)
-                print(f"JUEGO  |  ¡USUARIO ataca a {coord}!")
+                print(f"\n{'-'*40}")
+                print("JUEGO  |  Tu turno.")
+                coord = user.pensarAtaque(self.opcionesUser, self)
+                coord_legible = self.traducir("front", coord)
+                print(f"JUEGO  |  ¡Atacas a {coord_legible[0]}{coord_legible[1]}!")
                 if user.atacar(coord, self.barcosIA, self.opcionesUser, self.casillasTocadasUser):
-                    print("JUEGO  |  ¡TOCADO! El usuario actúa de nuevo.")
+                    self.revisarBarcos(self.barcosIA, self.casillasTocadasUser, self.tableroIA, self.casillasTocadasUser)
+                    print("JUEGO  |  ¡TOCADO! Atacas de nuevo.")
                     sleep(1)
                     continue
                 else:
-                    print("JUEGO  |  ¡AGUA! Fin del turno del usuario.")
+                    print("JUEGO  |  ¡AGUA! Fin de tu turno.")
+                    print("-"*40)
                     turno = "ia"
                     continue
+        
+        print("\n" + "="*50)
+        if all(barco["hundido"] for barco in self.barcosIA):
+            print("JUEGO  |  ¡¡¡VICTORIA!!! ¡Has hundido toda la flota enemiga!")
+        else:
+            print("JUEGO  |  ¡DERROTA! La IA ha hundido toda tu flota.")
+        print("="*50)
 
 class IA:
-    ''' OPONENTE IA'''
+    ''' Esta clase contiene las funciones que corresponden a la IA. '''
 
     def colocarBarcos(self, barcosIA, tableroIA):
         '''
-        Coloca los barcos de la IA en el tablero automáticamente
+        Coloca los barcos de la IA en el tablero automáticamente.
+        
         Args:
-            barcos (tuple list): Lista con barcos y tamaño
+            barcosIA (list): Lista de diccionarios con los barcos de la IA.
+            tableroIA (ndarray): Tablero donde se colocan los barcos.
         '''
-        letras = "ABCDEFGHIJ"
         for barco in barcosIA:
-            nombre = barco["nombre"]
             tamaño = barco["tamaño"]
             colocado = False
             while not colocado:
@@ -340,15 +419,15 @@ class IA:
         adyacentes = []
 
         # Mirar si izquierda y derecha son válidos
-        if x != 1:
+        if x != 0:
             adyacentes.append((x-1, y))
-        if x != 10:
+        if x != 9:
             adyacentes.append((x+1, y))
 
         # Mirar si arriba y abajo son válidos
-        if y != 1:
+        if y != 0:
             adyacentes.append((x, y-1))
-        if y != 10:
+        if y != 9:
             adyacentes.append((x, y+1))
 
         return adyacentes
@@ -440,6 +519,11 @@ class IA:
         
         Args:
             barcos (list): Lista de barcos restantes.
+            tableroIA (ndarray): Tablero de la IA.
+            opcionesIA (set): Coordenadas disponibles para atacar.
+
+        Returns:
+            probabilidades (ndarray): Matriz de probabilidades de cada casilla.
         '''
         
         tamaño_tablero = len(tableroIA)
@@ -484,6 +568,17 @@ class IA:
         return probabilidades
 
     def pensarAtaque(self, casillasTocadasIA, barcosUser, tableroIA, opcionesIA):
+        '''Decide la coordenada de ataque de la IA usando probabilidades y modo cacería.
+
+        Args:
+            casillasTocadasIA (set): Casillas tocadas pendientes de hundir.
+            barcosUser (list): Lista de barcos del usuario.
+            tableroIA (ndarray): Tablero de la IA (para calcular probabilidades).
+            opcionesIA (set): Coordenadas disponibles para atacar.
+
+        Returns:
+            tuple: Coordenada (fila, columna) elegida para atacar.
+        '''
         
         probabilidades = self.calcularProbabilidades(barcosUser, tableroIA, opcionesIA)
         probabilidades = self.aplicarPatronTablero(probabilidades)
@@ -512,10 +607,21 @@ class IA:
         return ataque
 
     def atacar(self, coord, barcosUser, opcionesIA, casillasTocadasIA):
+        '''Ataca una coordenada del tablero enemigo.
+
+        Args:
+            coord (tuple): Coordenada (fila, columna) a atacar.
+            barcosUser (list): Lista de barcos enemigos.
+            opcionesIA (set): Opciones de ataque disponibles.
+            casillasTocadasIA (set): Conjunto de casillas tocadas.
+
+        Returns:
+            bool: True si se tocó un barco, False si fue agua.
+        '''
+        opcionesIA.discard(coord)
         for barco in barcosUser:
             if coord in barco["coordenadas"]:
                 casillasTocadasIA.add(coord)
-                opcionesIA.discard(coord)
                 return True
         return False
 
@@ -526,5 +632,3 @@ user = User()
 ia = IA()
 
 controller.empezarJuego()
-
-print(controller.tableroUser)
