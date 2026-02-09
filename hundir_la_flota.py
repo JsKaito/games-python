@@ -258,11 +258,11 @@ class GameController:
         
         print("JUEGO  |  Se elegirá aleatoriamente el primer turno. ¡Suerte!")
         
-        controller.jugarTurnos(rd.choice("ia", "user"))
+        controller.jugarTurnos(rd.choice(["ia", "user"]))
 
     def jugarTurnos(self, turno):
         
-        while True:
+        while not all(barco["hundido"] for barco in barcosIA) and not all(barco["hundido"] for barco in barcosUser):
             
             if turno == "ia":
                 coord = ia.pensarAtaque(casillasTocadasIA)
@@ -279,7 +279,7 @@ class GameController:
             if turno == "user":
                 coord = user.pensarAtaque(casillasTocadasUser)
                 print(f"JUEGO  |  ¡USUARIO ataca a {coord}!")
-                if ia.atacar(coord):
+                if user.atacar(coord):
                     print("JUEGO  |  ¡TOCADO! El usuario actúa de nuevo.")
                     sleep(1)
                     continue
