@@ -19,7 +19,8 @@ tamaño = 10
 movimiento = ("A", 1)
 ultimoMovimiento = 0
 objetivos = []
-casillasTocadas = set()
+casillasTocadasIA = set()
+casillasTocadasUser = set()
 
 class User:
     # # --- TEST: Colocar barcos aleatorios para usuario ---
@@ -121,23 +122,44 @@ class User:
                 else:
                     print("No se puede colocar ahí. Intentalo de nuevo.")
 
+
+    def pensarAtaque(self):
+        letras = "ABCDEFGHIJ"
+        
+        while True:
+            entrada = input("¿Qué casilla quieres atacar? (Ejemplo: A10): ").strip().upper()
+            if not entrada:
+                print("Entrada vacía. Intenta de nuevo.")
+                continue
+            
+            letra = entrada[0]
+            if letra not in letras:
+                print("Letra fuera de rango (A-J). Intenta de nuevo.")
+                continue
+            
+            num = int(entrada[1:])
+            if num < 1 or num > 10:
+                print("Número fuera de rango (1-10). Intenta de nuevo.")
+                continue
+            
+            entrada = (letras.index(letra), num)
+
+            coord = GameController.traducir("back", entrada)
+            return coord
+
     def atacar(self, coord):
-        # TODO Función que ataque a casilla del tablero del usuario (TableroIA)
         
-        #! IMPORTANTE
-        # TODO Verificar si el ataque está en alguna coordenada de algún barco en el diccionario de barcos.
-        
-        for barco in barcosUser:
+        for barco in barcosIA:
             if coord in barco["coordenadas"]:
-                casillasTocadas.add(coord)
-                opcionesIA.discard(coord)
+                casillasTocadasUser.add(coord)
+                opcionesUser.discard(coord)
                 
                 return True
         return False
         
 
 class GameController:
-    ''' GAME CONTROLLER '''
+    ''' Controla el juego '''
 
     def crearBarcos(self):
         '''
@@ -197,7 +219,7 @@ class GameController:
         for barco in barcosUser:
             if all(coordenada in casillasTocadas for coordenada in barco["coordenadas"]) and barco["hundido"] == False:
                 for x, y in barco["coordenadas"]:
-                    casillasTocadas.discard((x, y))
+                    casillasTocadasIA.discard((x, y))
                     tableroUser[x][y] = -1
                 barco["hundido"] = True
 
@@ -214,7 +236,7 @@ class GameController:
 
     def turnos(self):
         while True:
-            coord = ia.pensarAtaque(casillasTocadas)
+            coord = ia.pensarAtaque(casillasTocadasIA)
             print(f"JUEGO: IA ataca a: {coord}")
             if ia.atacar(coord):
                 print("JUEGO: ¡La IA ha TOCADO un barco! Le toca de nuevo.")
@@ -353,26 +375,26 @@ class IA:
         
         return True
 
-    def hunt(self, casillasTocadas):
+    def hunt(self, casillasTocadasIA):
         
         '''
         La IA iniciará un modo cacería siempre que queden casillas en estado "tocado"
         
         Args:
-            casillasTocadas (tuple list): Lista de tuplas de casillas tocadas
+            casillasTocadasIA (tuple list): Lista de tuplas de casillas tocadas
             
         Returns:
             posiblesAtaques (tuple list): Lista de tuplas de posibles ataques
         '''
         
-        if not casillasTocadas: # Comprueba si hay elementos en el array
+        if not casillasTocadasIA: # Comprueba si hay elementos en el array
             return []
         
         posiblesAtaques = []
-        if len(casillasTocadas) >= 2: # Línea
+        if len(casillasTocadasIA) >= 2: # Línea
 
-            xs = {x for x, y in casillasTocadas}
-            ys = {y for x, y in casillasTocadas}
+            xs = {x for x, y in casillasTocadasIA}
+            ys = {y for x, y in casillasTocadasIA}
             
             if len(xs) == 1 and max(ys) - min(ys) + 1 == len(ys): # Si las 'x' son iguales y las 'y' son continuas, el barco está en vertical
                 x = next(iter(xs))
@@ -383,7 +405,7 @@ class IA:
                 posiblesAtaques = [(min(xs)-1, y), (max(xs)+1, y)]
 
         if not posiblesAtaques: # Si no encuentra línea, devuelve las adyacentes del tocado
-            for tocado in casillasTocadas:
+            for tocado in casillasTocadasIA:
                 posiblesAtaques.extend(self.obtenerAdyacentes(tocado))
                 
         # Esta línea es List Comprehension. Crea una lista nueva usando una antigua de forma directa, sin necesidad de crear una nueva lista auxiliar
@@ -440,13 +462,13 @@ class IA:
         
         return probabilidades
 
-    def pensarAtaque(self, casillasTocadas):
+    def pensarAtaque(self, casillasTocadasIA):
         
         probabilidades = self.calcularProbabilidades(barcosUser)
         probabilidades = self.aplicarPatronTablero(probabilidades)
         
-        if casillasTocadas:
-            casillasProbables = self.hunt(casillasTocadas)
+        if casillasTocadasIA:
+            casillasProbables = self.hunt(casillasTocadasIA)
 
             valores = [
                 ((x, y), probabilidades[x][y])
@@ -472,7 +494,7 @@ class IA:
         
         for barco in barcosUser:
             if coord in barco["coordenadas"]:
-                casillasTocadas.add(coord)
+                casillasTocadasIA.add(coord)
                 opcionesIA.discard(coord)
                 
                 return True
