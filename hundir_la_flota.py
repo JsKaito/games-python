@@ -194,6 +194,54 @@ class User:
 class GameController:
     ''' Esta clase contiene las funciones que corresponden al Game Controller '''
 
+    def imprimirCabeceraTurno(self, turno, numero_turno):
+        '''Imprime una cabecera visual para el turno actual.'''
+        jugador = "IA" if turno == "ia" else "USUARIO"
+        linea = "=" * 50
+        print(f"\n{linea}")
+        print(f"TURNO {numero_turno}  |  {jugador}")
+        print(linea)
+
+    def imprimirTablero(self, tablero, ataques, impactos, mostrar_barcos, titulo):
+        '''Imprime un tablero con formato visual.'''
+        letras = "ABCDEFGHIJ"
+        print(f"\n{titulo}")
+        print("   " + " ".join([str(i + 1) for i in range(10)]))
+        for fila in range(10):
+            print(letras[fila], end="  ")
+            for col in range(10):
+                coord = (fila, col)
+                if coord in impactos:
+                    simbolo = "X"
+                elif coord in ataques:
+                    simbolo = "o"
+                elif mostrar_barcos and tablero[fila][col] == 1:
+                    simbolo = "■"
+                else:
+                    simbolo = "~"
+                print(simbolo, end=" ")
+            print()
+
+    def imprimirTableroIAParaUsuario(self):
+        '''Muestra el tablero de la IA (solo ataques del usuario).'''
+        self.imprimirTablero(
+            self.tableroIA,
+            self.historialAtaquesUser,
+            self.impactosUser,
+            False,
+            "TABLERO IA (Ataques del usuario)"
+        )
+
+    def imprimirTableroUsuario(self):
+        '''Muestra el tablero del usuario (barcos y ataques de la IA).'''
+        self.imprimirTablero(
+            self.tableroUser,
+            self.historialAtaquesIA,
+            self.impactosIA,
+            True,
+            "TU TABLERO (Barcos y ataques de la IA)"
+        )
+
     def crearBarcos(self):
         '''
         Crea los barcos 
@@ -251,13 +299,16 @@ class GameController:
             casillasTocadasOponente (set): Casillas tocadas del oponente (para limpiar al hundir).
         '''
 
+        hundidos = []
         for barco in barcos:
             if all(coordenada in casillasTocadas for coordenada in barco["coordenadas"]) and barco["hundido"] == False:
                 for x, y in barco["coordenadas"]:
                     casillasTocadasOponente.discard((x, y))
                     tablero[x][y] = -1
                 barco["hundido"] = True
-                print(f"JUEGO  |  ¡¡{barco['nombre']} HUNDIDO!!")
+                hundidos.append(barco["nombre"])
+
+        return hundidos
 
     def traducir(self, modo, coordenada):
         '''Traduce coordenadas entre formato visual (letra, número) y formato interno (fila, columna).
@@ -297,6 +348,11 @@ class GameController:
         self.casillasTocadasIA = set()
         self.casillasTocadasUser = set()
 
+        self.historialAtaquesIA = set()
+        self.historialAtaquesUser = set()
+        self.impactosIA = set()
+        self.impactosUser = set()
+
         auto = input("¿Quieres colocar tus barcos de forma automática? (Si/No): ").strip().lower()
         auto = True if auto == "si" else False
         
@@ -324,38 +380,69 @@ class GameController:
             turno (str): Indica quién empieza, "ia" o "user".
         '''
         
+        turno_actual = None
+        numero_turno = 1
+
         while not all(barco["hundido"] for barco in self.barcosIA) and not all(barco["hundido"] for barco in self.barcosUser):
+
+            if turno != turno_actual:
+                self.imprimirCabeceraTurno(turno, numero_turno)
+                turno_actual = turno
             
             if turno == "ia":
                 coord = ia.pensarAtaque(self.casillasTocadasIA, self.barcosUser, self.tableroIA, self.opcionesIA)
                 coord_legible = self.traducir("front", coord)
                 print(f"\nJUEGO  |  ¡IA ataca a {coord_legible[0]}{coord_legible[1]}!")
-                if ia.atacar(coord, self.barcosUser, self.opcionesIA, self.casillasTocadasIA):
-                    self.revisarBarcos(self.barcosUser, self.casillasTocadasIA, self.tableroUser, self.casillasTocadasIA)
-                    print("JUEGO  |  ¡TOCADO! La IA actúa de nuevo.")
+                sleep(1)
+                impacto = ia.atacar(coord, self.barcosUser, self.opcionesIA, self.casillasTocadasIA)
+                self.historialAtaquesIA.add(coord)
+                if impacto:
+                    self.impactosIA.add(coord)
+                hundidos = self.revisarBarcos(self.barcosUser, self.casillasTocadasIA, self.tableroUser, self.casillasTocadasIA)
+
+                if impacto:
+                    if hundidos:
+                        print(f"JUEGO  |  ¡HUNDIDO! La IA ha hundido un {hundidos[0]}. La IA actúa de nuevo.")
+                    else:
+                        print("JUEGO  |  ¡TOCADO! La IA actúa de nuevo.")
+                    sleep(1)
+                    self.imprimirTableroUsuario()
                     sleep(1)
                     continue
                 else:
                     print("JUEGO  |  ¡AGUA! Fin del turno de la IA.")
+                    sleep(1)
+                    self.imprimirTableroUsuario()
                     print("-"*40)
                     turno = "user"
+                    numero_turno += 1
                     continue
             
             if turno == "user":
-                print(f"\n{'-'*40}")
-                print("JUEGO  |  Tu turno.")
+                self.imprimirTableroIAParaUsuario()
                 coord = user.pensarAtaque(self.opcionesUser, self)
                 coord_legible = self.traducir("front", coord)
                 print(f"JUEGO  |  ¡Atacas a {coord_legible[0]}{coord_legible[1]}!")
-                if user.atacar(coord, self.barcosIA, self.opcionesUser, self.casillasTocadasUser):
-                    self.revisarBarcos(self.barcosIA, self.casillasTocadasUser, self.tableroIA, self.casillasTocadasUser)
-                    print("JUEGO  |  ¡TOCADO! Atacas de nuevo.")
+                sleep(1)
+                impacto = user.atacar(coord, self.barcosIA, self.opcionesUser, self.casillasTocadasUser)
+                self.historialAtaquesUser.add(coord)
+                if impacto:
+                    self.impactosUser.add(coord)
+                hundidos = self.revisarBarcos(self.barcosIA, self.casillasTocadasUser, self.tableroIA, self.casillasTocadasUser)
+
+                if impacto:
+                    if hundidos:
+                        print(f"JUEGO  |  ¡HUNDIDO! Has hundido un {hundidos[0]}. Atacas de nuevo.")
+                    else:
+                        print("JUEGO  |  ¡TOCADO! Atacas de nuevo.")
                     sleep(1)
                     continue
                 else:
                     print("JUEGO  |  ¡AGUA! Fin de tu turno.")
+                    sleep(1)
                     print("-"*40)
                     turno = "ia"
+                    numero_turno += 1
                     continue
         
         print("\n" + "="*50)
