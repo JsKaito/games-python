@@ -353,6 +353,18 @@ class GameController:
         self.impactosIA = set()
         self.impactosUser = set()
 
+        while True:
+            print("\nDIFICULTADES:")
+            print("- Facil: La IA ataca siempre al azar.")
+            print("- Normal: La IA ataca al azar y usa el modo caza cuando toca un barco.")
+            print("- Difícil: La IA calcula las probabilidades de cada casilla y activa el modo caza cuando toca un barco. Siempre elige su mejor ataque.")
+            print("- Rage bait: La IA conoce la posición exacta de tus barcos, pero solo el 50% del tiempo para darte una oportunidad.")
+            dificultad = input("Elige dificultad (facil/normal/dificil/rage bait): ").strip().lower()
+            if dificultad in ("facil", "normal", "dificil", "rage bait", "ragebait"):
+                self.dificultad = "rage bait" if dificultad == "ragebait" else dificultad
+                break
+            print("Dificultad inválida. Usa: facil, normal, dificil o rage bait.")
+
         auto = input("¿Quieres colocar tus barcos de forma automática? (Si/No): ").strip().lower()
         auto = True if auto == "si" else False
         
@@ -390,7 +402,7 @@ class GameController:
                 turno_actual = turno
             
             if turno == "ia":
-                coord = ia.pensarAtaque(self.casillasTocadasIA, self.barcosUser, self.tableroIA, self.opcionesIA)
+                coord = ia.pensarAtaque(self.casillasTocadasIA, self.barcosUser, self.tableroIA, self.opcionesIA, self.dificultad)
                 coord_legible = self.traducir("front", coord)
                 print(f"\nJUEGO  |  ¡IA ataca a {coord_legible[0]}{coord_legible[1]}!")
                 sleep(1)
@@ -661,7 +673,7 @@ class IA:
         
         return probabilidades
 
-    def pensarAtaque(self, casillasTocadasIA, barcosUser, tableroIA, opcionesIA):
+    def pensarAtaque(self, casillasTocadasIA, barcosUser, tableroIA, opcionesIA, dificultad="dificil"):
         '''Decide la coordenada de ataque de la IA usando probabilidades y modo cacería.
 
         Args:
@@ -674,31 +686,39 @@ class IA:
             tuple: Coordenada (fila, columna) elegida para atacar.
         '''
         
+        dificultad = dificultad.lower()
+
+        if dificultad == "facil":
+            return rd.choice(list(opcionesIA))
+
+        if dificultad == "rage bait":
+            objetivos = [coord for barco in barcosUser for coord in barco["coordenadas"] if coord in opcionesIA]
+            if objetivos and rd.random() < 0.5:
+                return rd.choice(objetivos)
+            return rd.choice(list(opcionesIA))
+
         probabilidades = self.calcularProbabilidades(barcosUser, tableroIA, opcionesIA)
         probabilidades = self.aplicarPatronTablero(probabilidades)
-        
+
+        if dificultad == "normal" and casillasTocadasIA:
+            casillasProbables = self.hunt(casillasTocadasIA, opcionesIA)
+            if casillasProbables:
+                return rd.choice(casillasProbables)
+            return rd.choice(list(opcionesIA))
+
+        # dificil (actual): hunt + mapa de calor
         if casillasTocadasIA:
             casillasProbables = self.hunt(casillasTocadasIA, opcionesIA)
-
-            valores = [
-                ((x, y), probabilidades[x][y])
-                for x, y in casillasProbables
-                ]
-
+            valores = [((x, y), probabilidades[x][y]) for x, y in casillasProbables]
         else:
-            valores = [
-                ((x, y), probabilidades[x][y])
-                for x, y in opcionesIA
-                ]
-            
+            valores = [((x, y), probabilidades[x][y]) for x, y in opcionesIA]
+
         if not valores:
             return rd.choice(list(opcionesIA))
-        
-        maxProb = max(valores, key=lambda x: x[1])[1] # Obtiene mayor probabilidad
-        valores = [coord for coord, prob in valores if prob == maxProb] # Mira aquellas coordenadas con mayor probabilidad
-        ataque = rd.choice(valores)
-        
-        return ataque
+
+        maxProb = max(valores, key=lambda x: x[1])[1]
+        valores = [coord for coord, prob in valores if prob == maxProb]
+        return rd.choice(valores)
 
     def atacar(self, coord, barcosUser, opcionesIA, casillasTocadasIA):
         '''Ataca una coordenada del tablero enemigo.
