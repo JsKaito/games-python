@@ -14,14 +14,6 @@ import random as rd
 from time import sleep
 
 
-# ! ZONA DEBUG
-tamaño = 10
-movimiento = ("A", 1)
-ultimoMovimiento = 0
-objetivos = []
-casillasTocadasIA = set()
-casillasTocadasUser = set()
-
 class User:
     # --- TEST: Colocar barcos aleatorios para usuario ---
     def colocarBarcosUsuarioAleatorio(self, barcos, tablero):
@@ -534,8 +526,5 @@ user = User()
 ia = IA()
 
 controller.empezarJuego()
-
-
-
 
 print(controller.tableroUser)
