@@ -43,3 +43,36 @@ pip install numpy
 
 Desarrollado por Fernando, Lucía y Alfonso.  
 Inspirado en el clásico juego de batallas navales.
+
+## Buscaminas
+
+¡Bienvenido a Buscaminas! Versión en consola del clásico juego de minas.
+
+### Características
+
+- Tablero configurable (tamaños habituales: 9x9, 16x16) y número de minas ajustable.
+- Revelado de casillas y marcado de banderas.
+- Detección automática de victoria/derrota y visualización en consola.
+
+### Cómo jugar
+
+1. Ejecuta el script en Python:
+  ```
+  python buscaminas.py
+  ```
+2. Selecciona dimensiones y número de minas (si se solicita).
+3. Indica coordenadas para revelar casillas o marcar banderas.
+
+### Requisitos
+
+- Python 3.x
+
+### Estructura del juego
+
+- `buscaminas.py`: Código principal del juego.
+- Lógica de tablero, gestión de minas y banderas, y reglas de victoria/derrota.
+
+### Créditos
+
+Desarrollado por Fernando, Lucía y Alfonso.  
+Inspirado en el juego clásico Buscaminas.
