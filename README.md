@@ -78,5 +78,5 @@ Inspirado en el clásico juego de batallas navales.
 
 ## Créditos
 
-Desarrollado por Fernando, Lucía y Alfonso.  
+Desarrollado por Carlos, David y Rocío.  
 Inspirado en el juego clásico Buscaminas.
