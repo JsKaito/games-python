@@ -43,11 +43,9 @@ pip install numpy
 
 Desarrollado por Fernando, Lucía y Alfonso.  
 Inspirado en el clásico juego de batallas navales.
-
-
-
-
-
+  
+  
+  
 # Buscaminas
 
 ¡Bienvenido a Buscaminas! Versión en consola del clásico juego de minas.
